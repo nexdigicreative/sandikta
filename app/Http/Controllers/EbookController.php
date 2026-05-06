@@ -219,6 +219,7 @@ class EbookController extends Controller
             'file_path' => $filePath, 'file_hash' => hash_file('sha256', $pdfFile->getPathname()),
             'file_size' => $pdfFile->getSize(), 'cover_image' => $coverPath,
             'uploaded_by' => Auth::id(),
+            'is_active' => true,
         ]);
         ActivityLog::log('upload_ebook', "Upload eBook: {$ebook->title}", Ebook::class, $ebook->id);
         return redirect()->route('admin.ebooks.index')->with('success', 'eBook berhasil diupload!');
