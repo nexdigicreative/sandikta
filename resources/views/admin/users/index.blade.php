@@ -90,8 +90,17 @@
             </table>
         </div>
     </div>
+    <div class="card-footer bg-white border-top-0 px-4 py-3">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div class="text-secondary" style="font-size: 13px;">
+                Menampilkan <strong>{{ $users->firstItem() ?? 0 }}</strong> sampai <strong>{{ $users->lastItem() ?? 0 }}</strong> dari <strong>{{ $users->total() }}</strong> user
+            </div>
+            <div class="pagination-modern">
+                {{ $users->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    </div>
 </div>
-<div class="mt-3">{{ $users->withQueryString()->links() }}</div>
 
 <!-- Import Modal -->
 <div class="modal fade" id="importModal" tabindex="-1">

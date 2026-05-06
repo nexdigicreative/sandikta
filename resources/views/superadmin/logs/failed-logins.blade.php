@@ -25,7 +25,7 @@
                         <td style="font-size:12px;white-space:nowrap">{{ $fl->created_at->format('d/m/Y H:i:s') }}</td>
                         <td><strong>{{ $fl->username }}</strong></td>
                         <td style="font-size:13px">{{ $fl->ip_address }}</td>
-                        <td style="font-size:13px;color:#94a3b8">{{ $fl->browser }}</td>
+                        <td style="font-size:13px;color:#94a3b8;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ $fl->browser }}">{{ $fl->browser }}</td>
                         <td><span class="badge-modern badge-{{ $fl->reason === 'rate_limited' ? 'danger' : 'warning' }}">{{ $fl->reason }}</span></td>
                     </tr>
                     @empty
@@ -35,6 +35,15 @@
             </table>
         </div>
     </div>
+    <div class="card-footer bg-white border-top-0 px-4 py-3">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div class="text-secondary" style="font-size: 13px;">
+                Menampilkan <strong>{{ $failedLogins->firstItem() ?? 0 }}</strong> sampai <strong>{{ $failedLogins->lastItem() ?? 0 }}</strong> dari <strong>{{ $failedLogins->total() }}</strong> log
+            </div>
+            <div class="pagination-modern">
+                {{ $failedLogins->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    </div>
 </div>
-<div class="mt-3">{{ $failedLogins->withQueryString()->links() }}</div>
 @endsection

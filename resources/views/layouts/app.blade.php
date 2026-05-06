@@ -572,6 +572,38 @@
             animation-delay: 0.4s;
             opacity: 0;
         }
+        /* PAGINATION */
+        .pagination-modern .pagination {
+            margin-bottom: 0;
+            gap: 6px;
+        }
+
+        .pagination-modern .page-link {
+            border: none;
+            border-radius: 10px !important;
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+
+        .pagination-modern .page-item.active .page-link {
+            background: var(--primary-gradient);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.2);
+        }
+
+        .pagination-modern .page-link:hover:not(.active) {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+
+        .pagination-modern .page-item.disabled .page-link {
+            background: #f1f5f9;
+            color: #cbd5e1;
+        }
     </style>
     @stack('styles')
 </head>

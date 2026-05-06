@@ -73,6 +73,15 @@
             </table>
         </div>
     </div>
+    <div class="card-footer bg-white border-top-0 px-4 py-3">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div class="text-secondary" style="font-size: 13px;">
+                Menampilkan <strong>{{ $ebooks->firstItem() ?? 0 }}</strong> sampai <strong>{{ $ebooks->lastItem() ?? 0 }}</strong> dari <strong>{{ $ebooks->total() }}</strong> eBook
+            </div>
+            <div class="pagination-modern">
+                {{ $ebooks->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    </div>
 </div>
-<div class="mt-3">{{ $ebooks->withQueryString()->links() }}</div>
 @endsection

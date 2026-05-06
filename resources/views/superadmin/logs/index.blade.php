@@ -51,7 +51,7 @@
                         <td><span class="badge-modern badge-info">{{ $log->action }}</span></td>
                         <td style="font-size:13px">{{ Str::limit($log->description, 50) }}</td>
                         <td style="font-size:12px;color:#94a3b8">{{ $log->ip_address }}</td>
-                        <td style="font-size:12px;color:#94a3b8">{{ $log->browser }}</td>
+                        <td style="font-size:12px;color:#94a3b8;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ $log->browser }}">{{ $log->browser }}</td>
                         <td>
                             <span class="badge-modern badge-{{ $log->severity === 'danger' ? 'danger' : ($log->severity === 'warning' ? 'warning' : 'success') }}">
                                 {{ $log->severity }}
@@ -65,6 +65,15 @@
             </table>
         </div>
     </div>
+    <div class="card-footer bg-white border-top-0 px-4 py-3">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div class="text-secondary" style="font-size: 13px;">
+                Menampilkan <strong>{{ $logs->firstItem() ?? 0 }}</strong> sampai <strong>{{ $logs->lastItem() ?? 0 }}</strong> dari <strong>{{ $logs->total() }}</strong> log
+            </div>
+            <div class="pagination-modern">
+                {{ $logs->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    </div>
 </div>
-<div class="mt-3">{{ $logs->withQueryString()->links() }}</div>
 @endsection

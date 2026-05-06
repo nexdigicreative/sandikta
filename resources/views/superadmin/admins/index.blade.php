@@ -38,6 +38,15 @@
             </table>
         </div>
     </div>
+    <div class="card-footer bg-white border-top-0 px-4 py-3">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div class="text-secondary" style="font-size: 13px;">
+                Menampilkan <strong>{{ $admins->firstItem() ?? 0 }}</strong> sampai <strong>{{ $admins->lastItem() ?? 0 }}</strong> dari <strong>{{ $admins->total() }}</strong> admin
+            </div>
+            <div class="pagination-modern">
+                {{ $admins->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    </div>
 </div>
-<div class="mt-3">{{ $admins->links() }}</div>
 @endsection
