@@ -6,11 +6,18 @@
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card-modern animate-fadeInUp delay-1" style="overflow:hidden">
-            <div style="height:320px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center">
+            <div style="height:320px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0f172a;padding:20px">
                 @if($ebook->cover_image)
-                <img src="{{ asset('storage/'.$ebook->cover_image) }}" style="width:100%;height:100%;object-fit:cover" alt="">
+                <!-- Blurred background for depth -->
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url('{{ asset('storage/'.$ebook->cover_image) }}');background-size:cover;background-position:center;filter:blur(15px) opacity(0.3);transform:scale(1.15)"></div>
+                <!-- Main sharp cover image -->
+                <img src="{{ asset('storage/'.$ebook->cover_image) }}" style="max-width:100%;max-height:100%;object-fit:contain;position:relative;z-index:1;box-shadow:0 10px 25px rgba(0,0,0,0.4);border-radius:4px" alt="">
                 @else
-                <i class="bi bi-book" style="font-size:80px;color:rgba(255,255,255,0.2)"></i>
+                <!-- Beautiful CSS Book Cover Fallback with Book Title -->
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;padding:30px;text-align:center;color:white;background:linear-gradient(135deg, #1e3a8a, #3b82f6)">
+                    <i class="bi bi-journal-text mb-3" style="font-size:48px;opacity:0.8"></i>
+                    <span style="font-size:16px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;text-transform:capitalize">{{ $ebook->title }}</span>
+                </div>
                 @endif
             </div>
             <div class="card-body text-center">
@@ -77,11 +84,18 @@
     @foreach($relatedEbooks as $rel)
     <div class="col-xl-3 col-md-6 col-sm-6 col-12">
         <div class="card-modern" style="transition:all .3s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-            <div style="height:140px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center">
+            <div style="height:220px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0f172a;padding:12px">
                 @if($rel->cover_image)
-                <img src="{{ asset('storage/'.$rel->cover_image) }}" style="width:100%;height:100%;object-fit:cover" alt="">
+                <!-- Blurred background for depth -->
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:url('{{ asset('storage/'.$rel->cover_image) }}');background-size:cover;background-position:center;filter:blur(10px) opacity(0.25);transform:scale(1.15)"></div>
+                <!-- Main sharp cover image -->
+                <img src="{{ asset('storage/'.$rel->cover_image) }}" style="max-width:100%;max-height:100%;object-fit:contain;position:relative;z-index:1;box-shadow:0 6px 16px rgba(0,0,0,0.35);border-radius:3px" alt="">
                 @else
-                <i class="bi bi-book" style="font-size:40px;color:rgba(255,255,255,0.2)"></i>
+                <!-- Beautiful CSS Book Cover Fallback with Book Title -->
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;padding:15px;text-align:center;color:white;background:linear-gradient(135deg, #1e3a8a, #3b82f6)">
+                    <i class="bi bi-journal-text mb-1" style="font-size:24px;opacity:0.8"></i>
+                    <span style="font-size:11px;font-weight:700;line-height:1.2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-transform:capitalize">{{ $rel->title }}</span>
+                </div>
                 @endif
             </div>
             <div class="card-body">

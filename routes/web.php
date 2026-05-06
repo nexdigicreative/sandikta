@@ -63,6 +63,8 @@ Route::middleware(['auth', 'check.active', 'auto.logout'])->group(function () {
 
             // eBook management
             Route::get('/ebooks', [EbookController::class, 'adminIndex'])->name('ebooks.index');
+            Route::get('/ebooks/bulk', [EbookController::class, 'bulkCreate'])->name('ebooks.bulk');
+            Route::post('/ebooks/bulk', [EbookController::class, 'bulkStore'])->name('ebooks.bulk.store');
             Route::get('/ebooks/create', [EbookController::class, 'create'])->name('ebooks.create');
             Route::post('/ebooks', [EbookController::class, 'store'])->name('ebooks.store');
             Route::get('/ebooks/{ebook}/edit', [EbookController::class, 'edit'])->name('ebooks.edit');

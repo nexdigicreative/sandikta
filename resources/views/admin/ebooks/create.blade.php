@@ -41,7 +41,8 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" style="font-weight:600;font-size:13px">Kelas Tujuan</label>
-                            <input type="text" name="kelas_tujuan" value="{{ old('kelas_tujuan') }}" class="form-control form-control-modern" placeholder="cth: X, XI, XII">
+                            <input type="text" name="kelas_tujuan" value="{{ old('kelas_tujuan', 'Umum') }}" class="form-control form-control-modern" placeholder="cth: X, XII, 10 tkj, 7 c, atau Umum">
+                            <small class="text-muted" style="font-size:10px;display:block;margin-top:2px">Ketik "Umum" agar tampil untuk semua kelas.</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label" style="font-weight:600;font-size:13px">ISBN</label>

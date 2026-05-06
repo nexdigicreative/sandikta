@@ -8,7 +8,10 @@
         <h5 style="font-weight:700;margin:0">Daftar eBook</h5>
         <p class="text-muted mb-0" style="font-size:13px">Kelola koleksi eBook perpustakaan</p>
     </div>
-    <a href="{{ route('admin.ebooks.create') }}" class="btn btn-primary-modern"><i class="bi bi-plus-lg me-1"></i>Upload eBook</a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.ebooks.bulk') }}" class="btn btn-success-modern"><i class="bi bi-cloud-arrow-up me-1"></i>Bulk Upload (Multi)</a>
+        <a href="{{ route('admin.ebooks.create') }}" class="btn btn-primary-modern"><i class="bi bi-plus-lg me-1"></i>Upload eBook</a>
+    </div>
 </div>
 
 <div class="card-modern mb-4">

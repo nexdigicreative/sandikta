@@ -16,12 +16,66 @@ class EbookController extends Controller
     public function index(Request $request)
     {
         $query = Ebook::with('category')->where('is_active', true);
+
+        // Smart Automatic Class Filtering for Student (role: user)
+        $user = Auth::user();
+        if ($user && $user->isUser()) {
+            $studentKelas = trim($user->kelas); // e.g. "12 tkj", "XII RPL 1", "7 c"
+
+            // Extract grade level (e.g. 10/X/x, 11/XI/xi, 12/XII/xii, 7/VII, 8/VIII, 9/IX)
+            $level = null;
+            $romanLevel = null;
+            if (preg_match('/^(12|xii)/i', $studentKelas)) {
+                $level = '12';
+                $romanLevel = 'XII';
+            } elseif (preg_match('/^(11|xi)/i', $studentKelas)) {
+                $level = '11';
+                $romanLevel = 'XI';
+            } elseif (preg_match('/^(10|x)/i', $studentKelas)) {
+                $level = '10';
+                $romanLevel = 'X';
+            } elseif (preg_match('/^(9|ix)/i', $studentKelas)) {
+                $level = '9';
+                $romanLevel = 'IX';
+            } elseif (preg_match('/^(8|viii)/i', $studentKelas)) {
+                $level = '8';
+                $romanLevel = 'VIII';
+            } elseif (preg_match('/^(7|vii)/i', $studentKelas)) {
+                $level = '7';
+                $romanLevel = 'VII';
+            }
+
+            $query->where(function ($q) use ($studentKelas, $level, $romanLevel) {
+                // 1. 'Umum' (default) - visible to everyone, including empty/null values
+                $q->whereNull('kelas_tujuan')
+                  ->orWhere('kelas_tujuan', '')
+                  ->orWhere('kelas_tujuan', 'like', '%Umum%');
+
+                // 2. Exact or sub-match on student's specific class (e.g. "12 tkj" matches "12 tkj" or "7 c" matches "7 c")
+                if (!empty($studentKelas)) {
+                    $q->orWhere('kelas_tujuan', $studentKelas)
+                      ->orWhere('kelas_tujuan', 'like', "%{$studentKelas}%");
+                }
+
+                // 3. Match general grade level (e.g. a student in "12 tkj" can see books targeted at "12" or "XII")
+                if ($level) {
+                    $q->orWhere('kelas_tujuan', $level)
+                      ->orWhere('kelas_tujuan', $romanLevel)
+                      ->orWhere('kelas_tujuan', 'like', $level . ' %')
+                      ->orWhere('kelas_tujuan', 'like', $romanLevel . ' %')
+                      ->orWhere('kelas_tujuan', 'like', '% ' . $level)
+                      ->orWhere('kelas_tujuan', 'like', '% ' . $romanLevel);
+                }
+            });
+        }
+
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(fn($q) => $q->where('title','like',"%{$s}%")->orWhere('author','like',"%{$s}%"));
         }
         if ($request->filled('category')) $query->where('category_id', $request->category);
         if ($request->filled('kelas')) $query->where('kelas_tujuan', $request->kelas);
+        
         $ebooks = $query->latest()->paginate(12);
         $categories = Category::where('is_active', true)->get();
         return view('user.ebooks.index', compact('ebooks', 'categories'));
@@ -168,6 +222,86 @@ class EbookController extends Controller
         ]);
         ActivityLog::log('upload_ebook', "Upload eBook: {$ebook->title}", Ebook::class, $ebook->id);
         return redirect()->route('admin.ebooks.index')->with('success', 'eBook berhasil diupload!');
+    }
+
+    public function bulkCreate()
+    {
+        $categories = Category::where('is_active', true)->get();
+        return view('admin.ebooks.bulk', compact('categories'));
+    }
+
+    public function bulkStore(Request $request)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'author' => 'nullable|string|max:255',
+                'publisher' => 'nullable|string|max:255',
+                'year' => 'nullable|integer|min:1900|max:'.(date('Y')+1),
+                'isbn' => 'nullable|string|max:20',
+                'category_id' => 'required|exists:categories,id',
+                'description' => 'nullable|string',
+                'kelas_tujuan' => 'nullable|string|max:50',
+                'pdf_file' => 'required|file|mimes:pdf|max:51200',
+                'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            ]);
+
+            $pdfFile = $request->file('pdf_file');
+            if ($pdfFile->getMimeType() !== 'application/pdf') {
+                return response()->json(['success' => false, 'message' => 'File bukan PDF valid.'], 400);
+            }
+
+            $fileName = Str::uuid() . '.pdf';
+            $filePath = $pdfFile->storeAs('ebooks/pdfs', $fileName, 'local');
+
+            $coverPath = null;
+            if ($request->hasFile('cover_image')) {
+                $c = $request->file('cover_image');
+                $coverPath = $c->storeAs('ebooks/covers', Str::uuid().'.'.$c->getClientOriginalExtension(), 'public');
+            }
+
+            $author = $request->filled('author') ? $request->author : 'Perpustakaan';
+
+            $ebook = Ebook::create([
+                'title' => $request->title,
+                'author' => $author,
+                'publisher' => $request->publisher,
+                'year' => $request->year ?? date('Y'),
+                'isbn' => $request->isbn,
+                'category_id' => $request->category_id,
+                'description' => $request->description,
+                'kelas_tujuan' => $request->kelas_tujuan,
+                'file_path' => $filePath,
+                'file_hash' => hash_file('sha256', $pdfFile->getPathname()),
+                'file_size' => $pdfFile->getSize(),
+                'cover_image' => $coverPath,
+                'uploaded_by' => Auth::id(),
+                'is_active' => true,
+            ]);
+
+            ActivityLog::log('upload_ebook', "Bulk Upload eBook: {$ebook->title}", Ebook::class, $ebook->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'eBook berhasil diupload!',
+                'ebook' => [
+                    'id' => $ebook->id,
+                    'title' => $ebook->title,
+                    'author' => $ebook->author,
+                ]
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function edit(Ebook $ebook)
