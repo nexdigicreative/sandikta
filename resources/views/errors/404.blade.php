@@ -67,15 +67,7 @@
         <div class="error-code">404</div>
         <div class="error-title">Halaman Tidak Ditemukan</div>
         <p class="error-msg">Halaman yang Anda cari tidak tersedia atau telah dipindahkan.</p>
-        @php
-            $dashUrl = '/';
-            if(Auth::check()) {
-                if(Auth::user()->role === 'superadmin') $dashUrl = route('superadmin.dashboard');
-                elseif(Auth::user()->role === 'admin') $dashUrl = route('admin.dashboard');
-                else $dashUrl = route('user.dashboard');
-            }
-        @endphp
-        <a href="{{ $dashUrl }}" class="btn-home">Kembali ke Beranda</a>
+        <a href="{{ url('/dasboard') }}" class="btn-home">Kembali ke Beranda</a>
     </div>
 </body>
 
