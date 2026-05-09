@@ -477,7 +477,7 @@
             flex-shrink: 0;
         }
 
-        /* RESPONSIVE */
+        /* RESPONSIVE - TABLET */
         @media (max-width: 991px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -501,6 +501,191 @@
 
             .topbar {
                 padding: 0 16px;
+            }
+
+            /* Sidebar overlay backdrop */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1049;
+                backdrop-filter: blur(4px);
+            }
+            .sidebar-overlay.show { display: block; }
+
+            /* Card header stacking */
+            .card-modern .card-header {
+                padding: 16px 18px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .card-modern .card-body {
+                padding: 18px;
+            }
+
+            /* Table improvements */
+            .table-modern thead th {
+                padding: 10px 12px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .table-modern tbody td {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* RESPONSIVE - PHONE */
+        @media (max-width: 576px) {
+            .topbar {
+                height: 56px;
+                padding: 0 12px;
+                gap: 8px;
+            }
+
+            .topbar-title {
+                font-size: 16px;
+            }
+
+            .topbar-user .info { display: none; }
+
+            .topbar-user .avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+            }
+
+            .content-area {
+                padding: 16px 12px;
+            }
+
+            /* Stat cards */
+            .stat-card {
+                padding: 18px;
+            }
+
+            .stat-card .stat-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                font-size: 20px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 22px;
+            }
+
+            .stat-card .stat-label {
+                font-size: 12px;
+            }
+
+            /* Page headers - stack title and buttons */
+            .d-flex.justify-content-between.align-items-center.mb-4 {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+
+            .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex.gap-2 {
+                width: 100%;
+            }
+
+            .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex.gap-2 .btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            /* Cards */
+            .card-modern {
+                border-radius: 14px;
+            }
+
+            .card-modern .card-header {
+                padding: 14px 16px;
+            }
+
+            .card-modern .card-header h6 {
+                font-size: 14px;
+            }
+
+            .card-modern .card-body {
+                padding: 16px;
+            }
+
+            /* Buttons */
+            .btn-primary-modern,
+            .btn-outline-modern,
+            .btn-success-modern {
+                padding: 10px 16px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+
+            /* Forms */
+            .form-control-modern {
+                padding: 10px 14px;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+
+            /* Table */
+            .table-modern thead th {
+                padding: 8px 10px;
+                font-size: 10px;
+                letter-spacing: 0.3px;
+            }
+
+            .table-modern tbody td {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            /* Action buttons in table */
+            .table-modern .d-flex.gap-1 {
+                gap: 2px !important;
+            }
+
+            .table-modern .btn-sm {
+                padding: 4px 8px !important;
+                font-size: 11px;
+            }
+
+            /* Badges */
+            .badge-modern {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            /* Filter forms */
+            .card-modern .card-body.py-3 .row.g-2 {
+                gap: 8px !important;
+            }
+
+            /* Activity items */
+            .activity-item {
+                gap: 10px;
+                padding: 10px 0;
+            }
+
+            /* Modal */
+            .modal-content {
+                margin: 8px;
+                border-radius: 16px !important;
+            }
+
+            .modal-header {
+                padding: 18px !important;
+            }
+
+            .modal-body {
+                padding: 18px !important;
+            }
+
+            .modal-title {
+                font-size: 16px !important;
             }
         }
 
@@ -627,12 +812,14 @@
             </nav>
         </aside>
 
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- Main Content -->
         <div class="main-content">
             <header class="topbar">
                 <div class="d-flex align-items-center gap-3">
-                    <button class="btn-sidebar-toggle"
-                        onclick="document.getElementById('sidebar').classList.toggle('show')">
+                    <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
                         <i class="bi bi-list"></i>
                     </button>
                     <h1 class="topbar-title">@yield('page-title', 'Dashboard')</h1>
@@ -710,13 +897,30 @@
 
         // Auto-dismiss alerts
         document.querySelectorAll('.alert').forEach(a => setTimeout(() => { if (a) new bootstrap.Alert(a).close(); }, 5000));
-        // Sidebar mobile close on overlay click
-        document.addEventListener('click', function (e) {
+
+        // Sidebar toggle with overlay
+        function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            if (sidebar && sidebar.classList.contains('show') && !sidebar.contains(e.target) && !e.target.classList.contains('btn-sidebar-toggle')) {
-                sidebar.classList.remove('show');
-            }
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+
+        // Close sidebar on overlay click
+        document.getElementById('sidebarOverlay')?.addEventListener('click', closeSidebar);
+
+        // Close sidebar when a menu link is clicked (mobile)
+        document.querySelectorAll('.sidebar-link').forEach(function(link) {
+            link.addEventListener('click', closeSidebar);
         });
+
         // Confirm delete
         function confirmDelete(formId, title = 'Yakin ingin menghapus?') {
             Swal.fire({
