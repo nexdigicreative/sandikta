@@ -8,7 +8,8 @@
     <a href="{{ route('superadmin.admins.create') }}" class="btn btn-primary-modern"><i class="bi bi-plus-lg me-1"></i>Tambah Admin</a>
 </div>
 
-<div class="card-modern">
+{{-- Desktop Table --}}
+<div class="card-modern d-none d-md-block">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table-modern">
@@ -39,5 +40,38 @@
         </div>
     </div>
 </div>
+
+{{-- Mobile Card List --}}
+<div class="d-md-none">
+    @forelse($admins as $admin)
+    <div class="card-modern mb-2">
+        <div class="card-body" style="padding:14px 16px">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div style="min-width:0">
+                    <div style="font-weight:700;font-size:14px">{{ $admin->name }}</div>
+                    <div style="font-size:12px;color:#94a3b8">{{ $admin->email }}</div>
+                </div>
+                @if($admin->is_active)<span class="badge-modern badge-success">Aktif</span>@else<span class="badge-modern badge-danger">Nonaktif</span>@endif
+            </div>
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">
+                <i class="bi bi-clock me-1"></i>{{ $admin->last_login_at?->diffForHumans() ?? 'Belum login' }}
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('superadmin.admins.edit', $admin) }}" class="btn btn-sm btn-outline-primary flex-fill" style="border-radius:8px"><i class="bi bi-pencil me-1"></i>Edit</a>
+                <form method="POST" action="{{ route('superadmin.admins.toggle', $admin) }}" class="flex-fill">@csrf @method('PATCH')
+                    <button class="btn btn-sm {{ $admin->is_active ? 'btn-outline-warning' : 'btn-outline-success' }} w-100" style="border-radius:8px">
+                        <i class="bi bi-{{ $admin->is_active ? 'pause-circle' : 'play-circle' }} me-1"></i>{{ $admin->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('superadmin.admins.destroy', $admin) }}" id="del-admin-m-{{ $admin->id }}">@csrf @method('DELETE')</form>
+                <button class="btn btn-sm btn-outline-danger" style="border-radius:8px;padding:4px 10px" onclick="confirmDelete('del-admin-m-{{ $admin->id }}')"><i class="bi bi-trash"></i></button>
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="card-modern"><div class="card-body text-center text-muted py-4">Belum ada admin</div></div>
+    @endforelse
+</div>
+
 <div class="mt-3">{{ $admins->links() }}</div>
 @endsection

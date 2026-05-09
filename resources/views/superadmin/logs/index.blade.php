@@ -38,7 +38,8 @@
     </div>
 </div>
 
-<div class="card-modern">
+{{-- Desktop Table --}}
+<div class="card-modern d-none d-md-block">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table-modern">
@@ -66,5 +67,31 @@
         </div>
     </div>
 </div>
+
+{{-- Mobile Card List --}}
+<div class="d-md-none">
+    @forelse($logs as $log)
+    <div class="card-modern mb-2">
+        <div class="card-body" style="padding:14px 16px">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge-modern badge-{{ $log->severity === 'danger' ? 'danger' : ($log->severity === 'warning' ? 'warning' : 'success') }}">{{ $log->severity }}</span>
+                    <span class="badge-modern badge-info">{{ $log->action }}</span>
+                </div>
+                <small style="color:#94a3b8;font-size:11px;white-space:nowrap">{{ $log->created_at->format('d/m H:i') }}</small>
+            </div>
+            <div style="font-size:13px;font-weight:500;margin-bottom:4px">{{ Str::limit($log->description, 60) }}</div>
+            <div style="font-size:11px;color:#94a3b8">
+                <i class="bi bi-person me-1"></i>{{ $log->user?->name ?? 'System' }}
+                <span class="mx-1">•</span>
+                <i class="bi bi-geo-alt me-1"></i>{{ $log->ip_address }}
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="card-modern"><div class="card-body text-center text-muted py-4">Belum ada log</div></div>
+    @endforelse
+</div>
+
 <div class="mt-3">{{ $logs->withQueryString()->links() }}</div>
 @endsection

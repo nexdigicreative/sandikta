@@ -11,10 +11,10 @@
     <div class="d-flex gap-2">
         <!-- Import CSV -->
         <button class="btn btn-outline-modern" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="bi bi-upload me-1"></i>Import CSV
+            <i class="bi bi-upload me-1"></i><span class="d-none d-sm-inline">Import CSV</span>
         </button>
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary-modern">
-            <i class="bi bi-plus-lg me-1"></i>Tambah User
+            <i class="bi bi-plus-lg me-1"></i><span class="d-none d-sm-inline">Tambah User</span>
         </a>
     </div>
 </div>
@@ -23,23 +23,23 @@
 <div class="card-modern mb-4">
     <div class="card-body py-3">
         <form method="GET" class="row g-2 align-items-center">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-modern" placeholder="Cari nama, NIS, kelas...">
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <select name="status" class="form-control form-control-modern">
                     <option value="">Semua Status</option>
                     <option value="active" {{ request('status')=='active'?'selected':'' }}>Aktif</option>
                     <option value="inactive" {{ request('status')=='inactive'?'selected':'' }}>Nonaktif</option>
                 </select>
             </div>
-            <div class="col-md-3"><button type="submit" class="btn btn-primary-modern w-100"><i class="bi bi-search me-1"></i>Filter</button></div>
+            <div class="col-6 col-md-3"><button type="submit" class="btn btn-primary-modern w-100"><i class="bi bi-search me-1"></i>Filter</button></div>
         </form>
     </div>
 </div>
 
-<!-- Table -->
-<div class="card-modern">
+{{-- Desktop Table --}}
+<div class="card-modern d-none d-md-block">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table-modern">
@@ -87,6 +87,45 @@
         </div>
     </div>
 </div>
+
+{{-- Mobile Card List --}}
+<div class="d-md-none">
+    @forelse($users as $user)
+    <div class="card-modern mb-2">
+        <div class="card-body" style="padding:14px 16px">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div style="min-width:0">
+                    <div style="font-weight:700;font-size:14px">{{ $user->name }}</div>
+                    <div style="font-size:12px;color:#64748b">NIS: {{ $user->nis }} • {{ $user->kelas }}</div>
+                </div>
+                @if($user->is_active)<span class="badge-modern badge-success">Aktif</span>@else<span class="badge-modern badge-danger">Nonaktif</span>@endif
+            </div>
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">
+                <i class="bi bi-clock me-1"></i>{{ $user->last_login_at?->diffForHumans() ?? 'Belum login' }}
+                @if($user->tanggal_lahir)<span class="mx-1">•</span><i class="bi bi-calendar me-1"></i>{{ $user->tanggal_lahir->format('d/m/Y') }}@endif
+            </div>
+            <div class="d-flex gap-1">
+                <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary flex-fill" style="border-radius:8px"><i class="bi bi-pencil me-1"></i>Edit</a>
+                <form method="POST" action="{{ route('admin.users.toggle', $user) }}" class="d-inline">@csrf @method('PATCH')
+                    <button class="btn btn-sm {{ $user->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}" style="border-radius:8px;padding:4px 10px">
+                        <i class="bi bi-{{ $user->is_active ? 'pause-circle' : 'play-circle' }}"></i>
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline">@csrf @method('PATCH')
+                    <button class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" onclick="return confirm('Reset password user ini?')"><i class="bi bi-key"></i></button>
+                </form>
+                @if(auth()->user()->isSuperadmin())
+                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" id="del-user-m-{{ $user->id }}">@csrf @method('DELETE')</form>
+                <button class="btn btn-sm btn-outline-danger" style="border-radius:8px;padding:4px 10px" onclick="confirmDelete('del-user-m-{{ $user->id }}')"><i class="bi bi-trash"></i></button>
+                @endif
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="card-modern"><div class="card-body text-center text-muted py-4">Belum ada user</div></div>
+    @endforelse
+</div>
+
 <div class="mt-3">{{ $users->withQueryString()->links() }}</div>
 
 <!-- Import Modal -->
