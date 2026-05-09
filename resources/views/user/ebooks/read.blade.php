@@ -109,23 +109,46 @@
             position:fixed; bottom:0; left:0; right:0; z-index:100;
             background:rgba(15,23,42,0.95); backdrop-filter:blur(20px);
             border-top:1px solid rgba(255,255,255,0.08);
-            padding:8px 12px; padding-bottom: max(8px, env(safe-area-inset-bottom));
+            padding:10px 16px; padding-bottom: max(10px, env(safe-area-inset-bottom));
         }
 
-        .bottombar-row {
-            display:flex; align-items:center; justify-content:space-between; gap:6px;
+        .bottombar-main {
+            display:flex; align-items:center; justify-content:center; gap:12px;
         }
 
-        .bottombar-nav {
-            display:flex; align-items:center; gap:6px; flex:1; justify-content:center;
+        .bottombar-prev,
+        .bottombar-next {
+            flex-shrink:0;
+        }
+
+        .bottombar-center {
+            display:flex; align-items:center; gap:10px;
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
+            border-radius:12px; padding:6px 14px;
         }
 
         .bottombar-page {
-            font-size:13px; font-weight:600; color:#e2e8f0; min-width:80px; text-align:center;
+            font-size:14px; font-weight:600; color:#e2e8f0;
+            min-width:70px; text-align:center;
+            letter-spacing:0.5px;
+        }
+
+        .bottombar-divider {
+            width:1px; height:18px; background:rgba(255,255,255,0.12);
         }
 
         .bottombar-zoom {
-            display:flex; align-items:center; gap:4px;
+            display:flex; align-items:center; gap:6px;
+        }
+
+        .bottombar-zoom .btn-reader.btn-icon {
+            min-width:30px; min-height:30px; padding:4px;
+            background:transparent; border-color:transparent;
+        }
+        .bottombar-zoom .btn-reader.btn-icon:active { background:rgba(255,255,255,0.1); }
+
+        .bottombar-zoom .zoom-label {
+            font-size:11px; min-width:36px; color:#64748b;
         }
 
         /* ===== SWIPE HINT ===== */
@@ -162,7 +185,7 @@
             .desktop-controls .zoom-label { display:none; }
             .protected-badge span { display:none; }
 
-            .viewer-container { top:50px; bottom:60px; padding:10px; }
+            .viewer-container { top:50px; bottom:72px; padding:10px; }
             .watermark-overlay { top:50px; }
 
             .mobile-bottombar { display:block; }
@@ -185,11 +208,14 @@
             .desktop-controls #prev-page,
             .desktop-controls #next-page { display:none; }
 
-            .viewer-container { top:46px; bottom:56px; padding:6px; }
+            .viewer-container { top:46px; bottom:68px; padding:6px; }
             .watermark-overlay { top:46px; }
             .watermark-text { font-size:12px; }
 
-            .bottombar-page { font-size:12px; min-width:65px; }
+            .mobile-bottombar { padding:8px 10px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+            .bottombar-center { padding:5px 10px; gap:8px; }
+            .bottombar-page { font-size:13px; min-width:60px; }
+            .bottombar-main { gap:8px; }
         }
     </style>
 </head>
@@ -245,22 +271,24 @@
 
     <!-- ===== MOBILE BOTTOM BAR ===== -->
     <div class="mobile-bottombar" id="mobile-bottombar">
-        <div class="bottombar-row">
-            <button id="mob-prev" class="btn-reader btn-icon" title="Sebelumnya"><i class="bi bi-chevron-left"></i></button>
+        <div class="bottombar-main">
+            <button id="mob-prev" class="btn-reader btn-icon bottombar-prev" title="Sebelumnya"><i class="bi bi-chevron-left"></i></button>
 
-            <div class="bottombar-nav">
+            <div class="bottombar-center">
                 <div class="bottombar-zoom">
                     <button id="mob-zoom-out" class="btn-reader btn-icon" title="Perkecil"><i class="bi bi-dash-lg"></i></button>
                     <span class="zoom-label" id="mob-zoom-percent">100%</span>
                     <button id="mob-zoom-in" class="btn-reader btn-icon" title="Perbesar"><i class="bi bi-plus-lg"></i></button>
                 </div>
 
+                <div class="bottombar-divider"></div>
+
                 <div class="bottombar-page">
                     <span id="mob-page-num">0</span> / <span id="mob-page-count">0</span>
                 </div>
             </div>
 
-            <button id="mob-next" class="btn-reader btn-icon" title="Berikutnya"><i class="bi bi-chevron-right"></i></button>
+            <button id="mob-next" class="btn-reader btn-icon bottombar-next" title="Berikutnya"><i class="bi bi-chevron-right"></i></button>
         </div>
     </div>
 
