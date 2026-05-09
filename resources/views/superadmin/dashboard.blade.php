@@ -4,10 +4,10 @@
 
 @section('content')
 <!-- Stats Row -->
-<div class="row g-4 mb-4">
+<div class="row g-3 g-md-4 mb-4">
     <div class="col-xl-2 col-md-4 col-6">
         <div class="stat-card animate-fadeInUp delay-1">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-blue"><i class="bi bi-people-fill"></i></div>
             </div>
             <div class="stat-value">{{ $totalUsers }}</div>
@@ -16,7 +16,7 @@
     </div>
     <div class="col-xl-2 col-md-4 col-6">
         <div class="stat-card animate-fadeInUp delay-2">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-purple"><i class="bi bi-person-gear"></i></div>
             </div>
             <div class="stat-value">{{ $totalAdmins }}</div>
@@ -25,7 +25,7 @@
     </div>
     <div class="col-xl-2 col-md-4 col-6">
         <div class="stat-card animate-fadeInUp delay-3">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-cyan"><i class="bi bi-journal-richtext"></i></div>
             </div>
             <div class="stat-value">{{ $totalEbooks }}</div>
@@ -34,7 +34,7 @@
     </div>
     <div class="col-xl-2 col-md-4 col-6">
         <div class="stat-card animate-fadeInUp delay-1">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-emerald"><i class="bi bi-person-check"></i></div>
             </div>
             <div class="stat-value">{{ $activeUsers }}</div>
@@ -43,7 +43,7 @@
     </div>
     <div class="col-xl-2 col-md-4 col-6">
         <div class="stat-card animate-fadeInUp delay-2">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-rose"><i class="bi bi-person-x"></i></div>
             </div>
             <div class="stat-value">{{ $inactiveUsers }}</div>
@@ -52,7 +52,7 @@
     </div>
     <div class="col-xl-2 col-md-4 col-6">
         <div class="stat-card animate-fadeInUp delay-3">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-amber"><i class="bi bi-eye"></i></div>
             </div>
             <div class="stat-value">{{ $totalReads }}</div>
@@ -69,7 +69,7 @@
                 <h6><i class="bi bi-bar-chart-line me-2 text-primary"></i>Statistik Pembacaan {{ date('Y') }}</h6>
             </div>
             <div class="card-body">
-                <canvas id="readingChart" height="280"></canvas>
+                <canvas id="readingChart" style="max-height:280px;width:100%"></canvas>
             </div>
         </div>
     </div>

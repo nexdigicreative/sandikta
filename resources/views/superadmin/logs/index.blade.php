@@ -6,10 +6,10 @@
 <div class="card-modern mb-4">
     <div class="card-body py-3">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-modern" placeholder="Cari...">
             </div>
-            <div class="col-md-2">
+            <div class="col-6 col-md-2">
                 <select name="action" class="form-control form-control-modern">
                     <option value="">Semua Aksi</option>
                     @foreach($actions as $act)
@@ -17,7 +17,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-6 col-md-2">
                 <select name="severity" class="form-control form-control-modern">
                     <option value="">Semua Level</option>
                     <option value="info" {{ request('severity')=='info'?'selected':'' }}>Info</option>
@@ -25,13 +25,13 @@
                     <option value="danger" {{ request('severity')=='danger'?'selected':'' }}>Danger</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-6 col-md-2">
                 <input type="date" name="date_from" value="{{ request('date_from') }}" class="form-control form-control-modern" placeholder="Dari">
             </div>
-            <div class="col-md-2">
+            <div class="col-6 col-md-2">
                 <input type="date" name="date_to" value="{{ request('date_to') }}" class="form-control form-control-modern" placeholder="Sampai">
             </div>
-            <div class="col-md-1">
+            <div class="col-12 col-md-1">
                 <button type="submit" class="btn btn-primary-modern w-100"><i class="bi bi-search"></i></button>
             </div>
         </form>
