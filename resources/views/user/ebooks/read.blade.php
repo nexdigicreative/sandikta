@@ -232,7 +232,7 @@
          */
         const pdfUrl = '{{ route('pdf.stream', $ebook) }}?token={{ $token }}';
         
-        pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc_) {
+        pdfjsLib.getDocument({ url: pdfUrl, withCredentials: true }).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
             document.getElementById('page-count').textContent = pdfDoc.numPages;
             document.getElementById('loader').style.display = 'none';
@@ -241,7 +241,7 @@
             renderPage(pageNum);
         }).catch(function(error) {
             console.error('Error loading PDF:', error);
-            document.getElementById('loader').innerHTML = '<div style="color:#ef4444;text-align:center">Gagal memuat eBook. Sesi mungkin kedaluwarsa.<br><br><a href="" class="btn-reader">Refresh Halaman</a></div>';
+            document.getElementById('loader').innerHTML = '<div style="color:#ef4444;text-align:center">Gagal memuat eBook.<br>Sesi mungkin kedaluwarsa atau file PDF tidak ditemukan di server.<br><br><a href="" class="btn-reader" style="margin: 0 auto;">Refresh Halaman</a></div>';
         });
 
         // --- Security measures ---
