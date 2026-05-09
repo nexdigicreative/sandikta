@@ -68,7 +68,9 @@
                 </div>
             </div>
         </div>
-        <div class="mt-3">{{ $categories->links() }}</div>
+        <div class="mt-3 pagination-wrapper">
+            {{ $categories->links() }}
+        </div>
     </div>
 </div>
 @endsection

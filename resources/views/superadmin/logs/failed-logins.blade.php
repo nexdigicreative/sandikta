@@ -59,5 +59,7 @@
     @endforelse
 </div>
 
-<div class="mt-3">{{ $failedLogins->withQueryString()->links() }}</div>
+<div class="mt-3 pagination-wrapper">
+    {{ $failedLogins->withQueryString()->links() }}
+</div>
 @endsection

@@ -93,5 +93,7 @@
     @endforelse
 </div>
 
-<div class="mt-3">{{ $logs->withQueryString()->links() }}</div>
+<div class="mt-3 pagination-wrapper">
+    {{ $logs->withQueryString()->links() }}
+</div>
 @endsection

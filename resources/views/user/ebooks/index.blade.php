@@ -74,5 +74,7 @@
     @endforelse
 </div>
 
-<div class="mt-4 d-flex justify-content-center">{{ $ebooks->withQueryString()->links() }}</div>
+<div class="mt-4 d-flex justify-content-center pagination-wrapper">
+    {{ $ebooks->withQueryString()->links() }}
+</div>
 @endsection

@@ -73,5 +73,7 @@
     @endforelse
 </div>
 
-<div class="mt-3">{{ $admins->links() }}</div>
+<div class="mt-3 pagination-wrapper">
+    {{ $admins->links() }}
+</div>
 @endsection

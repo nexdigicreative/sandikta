@@ -118,5 +118,7 @@
     @endforelse
 </div>
 
-<div class="mt-3">{{ $ebooks->withQueryString()->links() }}</div>
+<div class="mt-3 pagination-wrapper">
+    {{ $ebooks->withQueryString()->links() }}
+</div>
 @endsection

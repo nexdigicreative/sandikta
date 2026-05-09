@@ -687,6 +687,50 @@
             .modal-title {
                 font-size: 16px !important;
             }
+
+            /* Pagination */
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 4px;
+            }
+            .pagination .page-item .page-link {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+
+        /* Pagination General */
+        .pagination {
+            margin-bottom: 0;
+        }
+        .pagination .page-link {
+            border-radius: 8px;
+            margin: 0 2px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .pagination .page-item.active .page-link {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.2);
+        }
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            border-radius: 8px;
+        }
+        .pagination-wrapper {
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+        }
+        .pagination-wrapper::-webkit-scrollbar {
+            height: 4px;
+        }
+        .pagination-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
         }
 
         /* ANIMATIONS */
