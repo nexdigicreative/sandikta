@@ -74,18 +74,34 @@ class EbookController extends Controller
     {
         $sessionToken = session("pdf_token_{$ebook->id}");
         $tokenTime = session("pdf_token_time_{$ebook->id}");
+        $requestToken = $request->query('token');
 
-        if (!$sessionToken || $request->query('token') !== $sessionToken) {
-            ActivityLog::log('illegal_access', "Percobaan akses ilegal PDF: {$ebook->title}", Ebook::class, $ebook->id, 'danger');
-            abort(403, 'Token akses tidak valid.');
+        if (!$sessionToken || $requestToken !== $sessionToken) {
+            \Illuminate\Support\Facades\Log::error("Ebook Access Denied: Token mismatch or session lost.", [
+                'ebook_id' => $ebook->id,
+                'has_session_token' => !empty($sessionToken),
+                'token_match' => ($requestToken === $sessionToken)
+            ]);
+            ActivityLog::log('illegal_access', "Percobaan akses ilegal PDF (Token mismatch): {$ebook->title}", Ebook::class, $ebook->id, 'danger');
+            abort(403, 'Token akses tidak valid atau sesi berakhir.');
         }
+
         if (!$tokenTime || (time() - $tokenTime > 7200)) {
+            \Illuminate\Support\Facades\Log::error("Ebook Access Denied: Token expired.", [
+                'ebook_id' => $ebook->id,
+                'token_age' => $tokenTime ? (time() - $tokenTime) : 'N/A'
+            ]);
             session()->forget(["pdf_token_{$ebook->id}", "pdf_token_time_{$ebook->id}"]);
             abort(403, 'Token akses kedaluwarsa. Silakan buka ulang eBook.');
         }
 
         if (!Storage::disk('local')->exists($ebook->file_path)) {
-            abort(404, 'File PDF tidak ditemukan di server.');
+            \Illuminate\Support\Facades\Log::error("Ebook File Not Found: {$ebook->file_path}", [
+                'ebook_id' => $ebook->id,
+                'path' => $ebook->file_path,
+                'disk' => 'local'
+            ]);
+            abort(404, 'File PDF tidak ditemukan di server. Jika Anda baru saja melakukan deploy, file yang diupload sebelumnya mungkin terhapus.');
         }
 
         $filePath = Storage::disk('local')->path($ebook->file_path);
