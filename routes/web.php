@@ -58,10 +58,14 @@ Route::middleware(['auth', 'check.active', 'auto.logout'])->group(function () {
             Route::patch('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
             Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
             Route::get('/users/template', [UserController::class, 'template'])->name('users.template');
+            Route::get('/users/delete-template', [UserController::class, 'deleteTemplate'])->name('users.delete-template');
             Route::post('/users/import', [UserController::class, 'import'])->name('users.import');
+            Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
 
             // eBook management
             Route::get('/ebooks', [EbookController::class, 'adminIndex'])->name('ebooks.index');
+            Route::get('/ebooks/bulk', [EbookController::class, 'bulkCreate'])->name('ebooks.bulk');
+            Route::post('/ebooks/bulk', [EbookController::class, 'bulkStore'])->name('ebooks.bulk.store');
             Route::get('/ebooks/create', [EbookController::class, 'create'])->name('ebooks.create');
             Route::post('/ebooks', [EbookController::class, 'store'])->name('ebooks.store');
             Route::get('/ebooks/{ebook}/edit', [EbookController::class, 'edit'])->name('ebooks.edit');

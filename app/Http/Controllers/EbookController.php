@@ -9,6 +9,7 @@ use App\Models\ReadingHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class EbookController extends Controller
@@ -129,6 +130,76 @@ class EbookController extends Controller
         $ebooks = $query->latest()->paginate(15);
         $categories = Category::all();
         return view('admin.ebooks.index', compact('ebooks', 'categories'));
+    }
+
+    public function bulkCreate()
+    {
+        $categories = Category::where('is_active', true)->get();
+        return view('admin.ebooks.bulk', compact('categories'));
+    }
+
+    public function bulkStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'pdf_file' => 'required|file|mimes:pdf|max:102400',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'year' => 'nullable|integer|min:1900|max:'.(date('Y')+1),
+            'isbn' => 'nullable|string|max:20',
+            'kelas_tujuan' => 'nullable|string|max:50',
+            'publisher' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $pdfFile = $request->file('pdf_file');
+            $fileName = Str::uuid() . '.pdf';
+            $filePath = $pdfFile->storeAs('ebooks/pdfs', $fileName, 'local');
+
+            $coverPath = null;
+            if ($request->hasFile('cover_image')) {
+                $c = $request->file('cover_image');
+                $coverPath = $c->storeAs('ebooks/covers', Str::uuid().'.'.$c->getClientOriginalExtension(), 'public');
+            }
+
+            $ebook = Ebook::create([
+                'title' => $request->title,
+                'author' => $request->author,
+                'publisher' => $request->publisher,
+                'year' => $request->year,
+                'isbn' => $request->isbn,
+                'category_id' => $request->category_id,
+                'description' => $request->description ?? null,
+                'kelas_tujuan' => $request->kelas_tujuan,
+                'file_path' => $filePath,
+                'file_hash' => hash_file('sha256', $pdfFile->getPathname()),
+                'file_size' => $pdfFile->getSize(),
+                'cover_image' => $coverPath,
+                'uploaded_by' => Auth::id(),
+                'is_active' => true,
+            ]);
+
+            ActivityLog::log('upload_ebook', "Upload eBook (Bulk): {$ebook->title}", Ebook::class, $ebook->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'eBook berhasil diupload',
+                'data' => $ebook
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan ke database: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function create()

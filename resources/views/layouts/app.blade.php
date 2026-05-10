@@ -986,7 +986,7 @@
         Swal.fire({
             icon: 'success',
             title: 'Berhasil!',
-            text: '{!! session('success') !!}',
+            html: '{!! session('success') !!}',
             confirmButtonColor: '#3b82f6',
             confirmButtonText: 'Tutup'
         });
@@ -996,7 +996,7 @@
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: '{!! session('error') !!}',
+            html: '{!! session('error') !!}',
             confirmButtonColor: '#ef4444',
             confirmButtonText: 'Tutup'
         });
@@ -1006,7 +1006,7 @@
         Swal.fire({
             icon: 'warning',
             title: 'Perhatian',
-            text: '{!! session('warning') !!}',
+            html: '{!! session('warning') !!}',
             confirmButtonColor: '#f59e0b',
             confirmButtonText: 'Tutup'
         });

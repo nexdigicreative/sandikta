@@ -9,6 +9,12 @@
         <p class="text-muted mb-0" style="font-size:13px">Kelola semua akun murid</p>
     </div>
     <div class="d-flex gap-2">
+        <!-- Bulk Delete CSV -->
+        @if(auth()->user()->isSuperadmin())
+        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
+            <i class="bi bi-trash-fill me-1"></i><span class="d-none d-sm-inline">Hapus Masal</span>
+        </button>
+        @endif
         <!-- Import CSV -->
         <button class="btn btn-outline-modern" data-bs-toggle="modal" data-bs-target="#importModal">
             <i class="bi bi-upload me-1"></i><span class="d-none d-sm-inline">Import CSV</span>
@@ -18,6 +24,25 @@
         </a>
     </div>
 </div>
+
+{{-- Bulk Action Bar (Floating/Hidden) --}}
+@if(auth()->user()->isSuperadmin())
+<div id="bulk-action-bar" class="card-modern mb-4 d-none animate-fadeInUp" style="background: #fff1f2; border-color: #fecdd3;">
+    <div class="card-body py-2 d-flex justify-content-between align-items-center">
+        <div class="text-danger fw-bold" style="font-size: 14px;">
+            <i class="bi bi-check2-square me-2"></i><span id="selected-count">0</span> Anggota Terpilih
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">Batal</button>
+            <form action="{{ route('admin.users.bulk-delete') }}" method="POST" id="bulk-delete-form">
+                @csrf
+                <div id="selected-ids-container"></div>
+                <button type="button" class="btn btn-sm btn-danger" onclick="confirmBulkDelete()">Hapus Semua Terpilih</button>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Filter -->
 <div class="card-modern mb-4">
@@ -44,11 +69,19 @@
         <div class="table-responsive">
             <table class="table-modern">
                 <thead>
-                    <tr><th>NIS</th><th>Nama</th><th>Kelas</th><th>Tgl Lahir</th><th>Status</th><th>Login Terakhir</th><th>Aksi</th></tr>
+                    <tr>
+                        @if(auth()->user()->isSuperadmin())
+                        <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all" class="form-check-input"></th>
+                        @endif
+                        <th>NIS</th><th>Nama</th><th>Kelas</th><th>Tgl Lahir</th><th>Status</th><th>Login Terakhir</th><th>Aksi</th>
+                    </tr>
                 </thead>
                 <tbody>
                     @forelse($users as $user)
-                    <tr>
+                    <tr class="user-row" data-id="{{ $user->id }}">
+                        @if(auth()->user()->isSuperadmin())
+                        <td class="text-center"><input type="checkbox" class="form-check-input user-checkbox" value="{{ $user->id }}" onchange="updateBulkBar()"></td>
+                        @endif
                         <td><strong>{{ $user->nis }}</strong></td>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->kelas }}</td>
@@ -80,7 +113,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="text-center py-4 text-muted">Belum ada user</td></tr>
+                    <tr><td colspan="{{ auth()->user()->isSuperadmin() ? 8 : 7 }}" class="text-center py-4 text-muted">Belum ada user</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -91,12 +124,17 @@
 {{-- Mobile Card List --}}
 <div class="d-md-none">
     @forelse($users as $user)
-    <div class="card-modern mb-2">
+    <div class="card-modern mb-2 user-row-mobile" data-id="{{ $user->id }}">
         <div class="card-body" style="padding:14px 16px">
             <div class="d-flex justify-content-between align-items-start mb-2">
-                <div style="min-width:0">
-                    <div style="font-weight:700;font-size:14px">{{ $user->name }}</div>
-                    <div style="font-size:12px;color:#64748b">NIS: {{ $user->nis }} • {{ $user->kelas }}</div>
+                <div class="d-flex gap-2 align-items-center">
+                    @if(auth()->user()->isSuperadmin())
+                    <input type="checkbox" class="form-check-input user-checkbox" value="{{ $user->id }}" onchange="updateBulkBar()">
+                    @endif
+                    <div style="min-width:0">
+                        <div style="font-weight:700;font-size:14px">{{ $user->name }}</div>
+                        <div style="font-size:12px;color:#64748b">NIS: {{ $user->nis }} • {{ $user->kelas }}</div>
+                    </div>
                 </div>
                 @if($user->is_active)<span class="badge-modern badge-success">Aktif</span>@else<span class="badge-modern badge-danger">Nonaktif</span>@endif
             </div>
@@ -156,4 +194,104 @@
         </div>
     </div>
 </div>
+
+<!-- Bulk Delete Modal -->
+@if(auth()->user()->isSuperadmin())
+<div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius:20px;border:none">
+            <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding:24px; background: #fff1f2;">
+                <h5 class="modal-title text-danger" style="font-weight:700">Hapus User Masal (CSV)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ route('admin.users.bulk-delete') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body" style="padding:24px">
+                    <div class="alert alert-danger mb-3" style="border-radius:12px;border:none;background:#fee2e2;color:#991b1b;font-size:13px">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Hati-hati! Semua NIS yang terdaftar di file CSV akan <strong>DIHAPUS PERMANEN</strong> dari sistem.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Upload File CSV NIS</label>
+                        <input type="file" name="file" class="form-control form-control-modern" accept=".csv,.txt" required>
+                        <small class="text-muted mt-1 d-block" style="font-size: 11px;">Hanya butuh 1 kolom berisi NIS saja.</small>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between" style="border:none;padding:0 24px 24px">
+                    <a href="{{ route('admin.users.delete-template') }}" class="btn btn-outline-secondary" style="border-radius:12px;font-weight:600">
+                        <i class="bi bi-download me-1"></i>Template CSV
+                    </a>
+                    <button type="submit" class="btn btn-danger" style="border-radius:12px;font-weight:600" onclick="return confirm('Yakin ingin menghapus semua user dalam file ini?')">
+                        <i class="bi bi-trash-fill me-1"></i>Mulai Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+@push('scripts')
+<script>
+    // Checkbox logic
+    const checkAll = document.getElementById('check-all');
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    const bulkBar = document.getElementById('bulk-action-bar');
+    const selectedCountLabel = document.getElementById('selected-count');
+    const idsContainer = document.getElementById('selected-ids-container');
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function() {
+            userCheckboxes.forEach(cb => cb.checked = checkAll.checked);
+            updateBulkBar();
+        });
+    }
+
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.user-checkbox:checked');
+        const count = checked.length;
+        
+        if (count > 0) {
+            bulkBar.classList.remove('d-none');
+            selectedCountLabel.textContent = count;
+            
+            // Update hidden inputs
+            idsContainer.innerHTML = '';
+            checked.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'selected_users[]';
+                input.value = cb.value;
+                idsContainer.appendChild(input);
+            });
+        } else {
+            bulkBar.classList.add('d-none');
+            if (checkAll) checkAll.checked = false;
+        }
+    }
+
+    function deselectAll() {
+        userCheckboxes.forEach(cb => cb.checked = false);
+        if (checkAll) checkAll.checked = false;
+        updateBulkBar();
+    }
+
+    function confirmBulkDelete() {
+        const count = document.querySelectorAll('.user-checkbox:checked').length;
+        Swal.fire({
+            title: `Hapus ${count} User?`,
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus Semua!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('bulk-delete-form').submit();
+            }
+        });
+    }
+</script>
+@endpush
 @endsection
