@@ -102,8 +102,8 @@
                                         <i class="bi bi-{{ $user->is_active ? 'pause-circle' : 'play-circle' }}"></i>
                                     </button>
                                 </form>
-                                <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline">@csrf @method('PATCH')
-                                    <button class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" title="Reset Password" onclick="return confirm('Reset password user ini?')"><i class="bi bi-key"></i></button>
+                                <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline" id="reset-pass-{{ $user->id }}">@csrf @method('PATCH')
+                                    <button type="button" class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" title="Reset Password" onclick="confirmAction('reset-pass-{{ $user->id }}', 'Reset Password?', 'Password akan direset ke tanggal lahir (DDMMYYYY).', 'warning', 'Ya, Reset!')"><i class="bi bi-key"></i></button>
                                 </form>
                                 @if(auth()->user()->isSuperadmin())
                                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" id="del-user-{{ $user->id }}">@csrf @method('DELETE')</form>
@@ -149,8 +149,8 @@
                         <i class="bi bi-{{ $user->is_active ? 'pause-circle' : 'play-circle' }}"></i>
                     </button>
                 </form>
-                <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline">@csrf @method('PATCH')
-                    <button class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" onclick="return confirm('Reset password user ini?')"><i class="bi bi-key"></i></button>
+                <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline" id="reset-pass-m-{{ $user->id }}">@csrf @method('PATCH')
+                    <button type="button" class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" onclick="confirmAction('reset-pass-m-{{ $user->id }}', 'Reset Password?', 'Password akan direset ke tanggal lahir (DDMMYYYY).', 'warning', 'Ya, Reset!')"><i class="bi bi-key"></i></button>
                 </form>
                 @if(auth()->user()->isSuperadmin())
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" id="del-user-m-{{ $user->id }}">@csrf @method('DELETE')</form>

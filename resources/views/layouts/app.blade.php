@@ -508,11 +508,14 @@
                 display: none;
                 position: fixed;
                 inset: 0;
-                background: rgba(0,0,0,0.5);
+                background: rgba(0, 0, 0, 0.5);
                 z-index: 1049;
                 backdrop-filter: blur(4px);
             }
-            .sidebar-overlay.show { display: block; }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
 
             /* Card header stacking */
             .card-modern .card-header {
@@ -550,7 +553,9 @@
                 font-size: 16px;
             }
 
-            .topbar-user .info { display: none; }
+            .topbar-user .info {
+                display: none;
+            }
 
             .topbar-user .avatar {
                 width: 36px;
@@ -589,11 +594,11 @@
                 gap: 12px;
             }
 
-            .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex.gap-2 {
+            .d-flex.justify-content-between.align-items-center.mb-4>.d-flex.gap-2 {
                 width: 100%;
             }
 
-            .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex.gap-2 .btn {
+            .d-flex.justify-content-between.align-items-center.mb-4>.d-flex.gap-2 .btn {
                 flex: 1;
                 text-align: center;
             }
@@ -694,6 +699,7 @@
                 justify-content: center;
                 gap: 4px;
             }
+
             .pagination .page-item .page-link {
                 padding: 6px 10px;
                 font-size: 12px;
@@ -708,6 +714,7 @@
             flex-wrap: wrap;
             gap: 4px;
         }
+
         .pagination .page-link {
             border-radius: 8px;
             margin: 0;
@@ -720,37 +727,45 @@
             align-items: center;
             justify-content: center;
         }
+
         .pagination .page-link:hover {
             background: #f1f5f9;
             color: var(--primary);
         }
+
         .pagination .page-item.active .page-link {
             background: var(--primary-gradient);
             border-color: transparent;
             box-shadow: 0 4px 10px rgba(30, 64, 175, 0.2);
             color: #fff;
         }
+
         .pagination .page-item.disabled .page-link {
             opacity: 0.4;
         }
+
         .pagination .page-item:first-child .page-link,
         .pagination .page-item:last-child .page-link {
             border-radius: 8px;
         }
+
         /* Fix SVG arrow sizes in pagination */
         .pagination .page-link svg {
             width: 16px;
             height: 16px;
             flex-shrink: 0;
         }
+
         .pagination-wrapper {
             overflow-x: auto;
             padding-bottom: 8px;
             scrollbar-width: thin;
         }
+
         .pagination-wrapper::-webkit-scrollbar {
             height: 4px;
         }
+
         .pagination-wrapper::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.1);
             border-radius: 4px;
@@ -763,21 +778,25 @@
             align-items: center;
             gap: 8px;
         }
-        nav[role="navigation"] > div {
+
+        nav[role="navigation"]>div {
             width: 100%;
         }
-        nav[role="navigation"] > div:first-child {
+
+        nav[role="navigation"]>div:first-child {
             text-align: center;
             font-size: 13px;
             color: var(--text-secondary);
         }
+
         /* Fix the flex row with prev/next arrows */
-        nav[role="navigation"] > div:last-child > div {
+        nav[role="navigation"]>div:last-child>div {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        nav[role="navigation"] span[aria-current="page"] > span {
+
+        nav[role="navigation"] span[aria-current="page"]>span {
             background: var(--primary-gradient) !important;
             border-color: transparent !important;
             border-radius: 8px !important;
@@ -789,8 +808,9 @@
             align-items: center;
             justify-content: center;
         }
+
         nav[role="navigation"] a,
-        nav[role="navigation"] span:not([aria-current="page"]) > span {
+        nav[role="navigation"] span:not([aria-current="page"])>span {
             border-radius: 8px !important;
             padding: 8px 14px !important;
             font-size: 14px !important;
@@ -799,6 +819,7 @@
             align-items: center;
             justify-content: center;
         }
+
         nav[role="navigation"] a svg,
         nav[role="navigation"] span svg {
             width: 16px !important;
@@ -983,33 +1004,33 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            html: '{!! session('success') !!}',
-            confirmButtonColor: '#3b82f6',
-            confirmButtonText: 'Tutup'
-        });
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{!! session('success') !!}',
+                confirmButtonColor: '#3b82f6',
+                confirmButtonText: 'Tutup'
+            });
         @endif
 
         @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html: '{!! session('error') !!}',
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Tutup'
-        });
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: '{!! session('error') !!}',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Tutup'
+            });
         @endif
 
         @if(session('warning'))
-        Swal.fire({
-            icon: 'warning',
-            title: 'Perhatian',
-            html: '{!! session('warning') !!}',
-            confirmButtonColor: '#f59e0b',
-            confirmButtonText: 'Tutup'
-        });
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                html: '{!! session('warning') !!}',
+                confirmButtonColor: '#f59e0b',
+                confirmButtonText: 'Tutup'
+            });
         @endif
 
         // Auto-dismiss alerts
@@ -1034,7 +1055,7 @@
         document.getElementById('sidebarOverlay')?.addEventListener('click', closeSidebar);
 
         // Close sidebar when a menu link is clicked (mobile)
-        document.querySelectorAll('.sidebar-link').forEach(function(link) {
+        document.querySelectorAll('.sidebar-link').forEach(function (link) {
             link.addEventListener('click', closeSidebar);
         });
 
@@ -1045,6 +1066,19 @@
                 icon: 'warning', showCancelButton: true,
                 confirmButtonColor: '#e11d48', cancelButtonColor: '#64748b',
                 confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
+            }).then(r => { if (r.isConfirmed) document.getElementById(formId).submit(); });
+        }
+        // Confirm action
+        function confirmAction(formId, title, text, icon = 'question', confirmText = 'Ya', confirmColor = '#3b82f6') {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonColor: confirmColor,
+                cancelButtonColor: '#64748b',
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Batal'
             }).then(r => { if (r.isConfirmed) document.getElementById(formId).submit(); });
         }
     </script>
