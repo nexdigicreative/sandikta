@@ -11,10 +11,13 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family:'Inter',sans-serif; background:#0f172a; overflow:hidden; height:100vh;
+            font-family:'Inter',sans-serif; background:#0f172a; overflow:hidden;
+            height: 100vh;
+            height: -webkit-fill-available;
             height: 100dvh;
             -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
 
         /* ===== TOPBAR ===== */
@@ -338,13 +341,22 @@
 
                 const viewport = page.getViewport({ scale: scale });
 
-                // Use devicePixelRatio for sharp rendering
-                const dpr = window.devicePixelRatio || 1;
-                canvas.height = viewport.height * dpr;
-                canvas.width = viewport.width * dpr;
+                // Use devicePixelRatio for sharp rendering (cap at 2 for iOS memory limits)
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                const dpr = Math.min(window.devicePixelRatio || 1, isIOS ? 2 : 3);
+                const maxCanvasArea = isIOS ? 16777216 : 67108864; // 4096x4096 for iOS, 8192x8192 otherwise
+                let renderWidth = viewport.width * dpr;
+                let renderHeight = viewport.height * dpr;
+                if (renderWidth * renderHeight > maxCanvasArea) {
+                    const ratio = Math.sqrt(maxCanvasArea / (renderWidth * renderHeight));
+                    renderWidth = Math.floor(renderWidth * ratio);
+                    renderHeight = Math.floor(renderHeight * ratio);
+                }
+                canvas.height = renderHeight;
+                canvas.width = renderWidth;
                 canvas.style.width = viewport.width + 'px';
                 canvas.style.height = viewport.height + 'px';
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.setTransform(renderWidth / viewport.width, 0, 0, renderHeight / viewport.height, 0, 0);
 
                 const renderContext = {
                     canvasContext: ctx,
@@ -369,8 +381,8 @@
                 document.getElementById('mob-page-num').textContent = num;
             }
 
-            // Scroll to top on page change
-            document.getElementById('viewer-container').scrollTo({ top: 0, behavior: 'instant' });
+            // Scroll to top on page change (iOS compatible)
+            try { document.getElementById('viewer-container').scrollTo({ top: 0, behavior: 'instant' }); } catch(e) { document.getElementById('viewer-container').scrollTop = 0; }
         }
 
         function queueRenderPage(num) {
@@ -476,7 +488,7 @@
         // ===== LOAD PDF =====
         const pdfUrl = '{{ route("pdf.stream", $ebook) }}?token={{ $token }}';
 
-        pdfjsLib.getDocument({ url: pdfUrl, withCredentials: true }).promise.then(function(pdfDoc_) {
+        pdfjsLib.getDocument({ url: pdfUrl }).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
             const totalPages = pdfDoc.numPages;
 
@@ -540,20 +552,23 @@
             }
         });
 
-        // Basic DevTools detection
-        let checkCount = 0;
-        const checkDevTools = setInterval(function() {
-            const threshold = 160;
-            if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-                checkCount++;
-                if(checkCount > 2) {
-                    document.body.innerHTML = '<div style="background:#0f172a;height:100vh;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;"><div><i class="bi bi-shield-slash" style="font-size:4rem;color:#ef4444;"></i><h2 style="margin:20px 0;">Developer Tools Terdeteksi</h2><p>Halaman ini ditutup untuk melindungi konten hak cipta.</p></div></div>';
-                    clearInterval(checkDevTools);
+        // Basic DevTools detection (skip on iOS/mobile to avoid false positives)
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!isIOSDevice && window.innerWidth > 1024) {
+            let checkCount = 0;
+            const checkDevTools = setInterval(function() {
+                const threshold = 160;
+                if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+                    checkCount++;
+                    if(checkCount > 3) {
+                        document.body.innerHTML = '<div style="background:#0f172a;height:100vh;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;"><div><i class="bi bi-shield-slash" style="font-size:4rem;color:#ef4444;"></i><h2 style="margin:20px 0;">Developer Tools Terdeteksi</h2><p>Halaman ini ditutup untuk melindungi konten hak cipta.</p></div></div>';
+                        clearInterval(checkDevTools);
+                    }
+                } else {
+                    checkCount = 0;
                 }
-            } else {
-                checkCount = 0;
-            }
-        }, 1000);
+            }, 1000);
+        }
     </script>
 </body>
 </html>

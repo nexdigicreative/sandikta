@@ -106,15 +106,17 @@ class EbookController extends Controller
         }
 
         $filePath = Storage::disk('local')->path($ebook->file_path);
+        $fileSize = filesize($filePath);
 
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . Str::slug($ebook->title) . '.pdf"',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Content-Length' => $fileSize,
+            'Accept-Ranges' => 'bytes',
+            'Cache-Control' => 'private, no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
             'Expires' => '0',
             'X-Content-Type-Options' => 'nosniff',
-            'X-Frame-Options' => 'SAMEORIGIN',
         ]);
     }
 
