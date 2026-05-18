@@ -912,6 +912,10 @@
                     <a href="{{ route('superadmin.logs.failed') }}"
                         class="sidebar-link {{ request()->routeIs('superadmin.logs.failed') ? 'active' : '' }}"><i
                             class="bi bi-shield-exclamation"></i>Login Gagal</a>
+                    <div class="sidebar-label">PERPUSTAKAAN</div>
+                    <a href="{{ route('ebooks.index') }}"
+                        class="sidebar-link {{ request()->routeIs('ebooks.index') && !request()->routeIs('admin.ebooks.*') ? 'active' : '' }}"><i
+                            class="bi bi-journal-richtext"></i>Koleksi eBook</a>
                     <div class="sidebar-label">AKUN</div>
                     <a href="{{ route('profile.show') }}"
                         class="sidebar-link {{ request()->routeIs('profile.show') ? 'active' : '' }}"><i
@@ -930,6 +934,10 @@
                     <a href="{{ route('admin.users.index') }}"
                         class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"><i
                             class="bi bi-people-fill"></i>Anggota</a>
+                    <div class="sidebar-label">PERPUSTAKAAN</div>
+                    <a href="{{ route('ebooks.index') }}"
+                        class="sidebar-link {{ request()->routeIs('ebooks.index') && !request()->routeIs('admin.ebooks.*') ? 'active' : '' }}"><i
+                            class="bi bi-journal-richtext"></i>Koleksi eBook</a>
                     <div class="sidebar-label">AKUN</div>
                     <a href="{{ route('profile.show') }}"
                         class="sidebar-link {{ request()->routeIs('profile.show') ? 'active' : '' }}"><i

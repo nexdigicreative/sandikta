@@ -23,5 +23,8 @@ class AppServiceProvider extends ServiceProvider
         if (!$this->app->environment('local')) {
             URL::forceScheme('https');
         }
+
+        \Carbon\Carbon::setLocale('id');
+        date_default_timezone_set('Asia/Jakarta');
     }
 }

@@ -96,8 +96,6 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if (auth()->user()->role !== 'superadmin')
-            abort(403);
         if ($user->role === 'superadmin')
             abort(403);
         $name = $user->name;
@@ -117,9 +115,14 @@ class UserController extends Controller
             $file = fopen('php://output', 'w');
             // nis row 01, nama lengkap row 02, kelas row 03, tanggal lahir row 04
             // Header CSV
-            fputcsv($file, ['NIS', 'Nama Lengkap', 'Kelas', 'Tanggal Lahir']);
+            fputcsv($file, ['NIS', 'Nama Lengkap', 'Kelas', 'Tanggal Lahir'], ';');
             // Contoh Data dari Gambar
-            fputcsv($file, ['10001', 'Arya Prasetyo', '11 TKJ', '01/05/2008']);
+            fputcsv($file, ['10001', 'Arya Prasetyo', 'VIII A', '01-01-2010'], ';');
+            fputcsv($file, ['10002', 'Aditya Pratama', 'IX B', '02-01-2010'], ';');
+            fputcsv($file, ['10003', 'Budi Santoso', 'X TKJ 1', '03-01-2010'], ';');
+            fputcsv($file, ['10004', 'Citra Lestari', 'X IPA 1', '04-01-2010'], ';');
+            fputcsv($file, ['10005', 'Deni Saputra', 'XI TKJ 2', '05-01-2010'], ';');
+            fputcsv($file, ['10006', 'Eka Sari', 'XI IPS 1', '06-01-2010'], ';');
 
             fclose($file);
         };
@@ -250,8 +253,13 @@ class UserController extends Controller
 
         $callback = function () {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['NIS', 'Nama Lengkap', 'Kelas', 'Tanggal Lahir']);
-            fputcsv($file, ['10001', 'Arya Prasetyo', '11 TKJ', '01/05/2008']);
+            fputcsv($file, ['NIS', 'Nama Lengkap', 'Kelas', 'Tanggal Lahir'], ';');
+            fputcsv($file, ['10001', 'Arya Prasetyo', 'VIII A', '01-01-2010'], ';');
+            fputcsv($file, ['10002', 'Aditya Pratama', 'IX B', '02-01-2010'], ';');
+            fputcsv($file, ['10003', 'Budi Santoso', 'X TKJ 1', '03-01-2010'], ';');
+            fputcsv($file, ['10004', 'Citra Lestari', 'X IPA 1', '04-01-2010'], ';');
+            fputcsv($file, ['10005', 'Deni Saputra', 'XI TKJ 2', '05-01-2010'], ';');
+            fputcsv($file, ['10006', 'Eka Sari', 'XI IPS 1', '06-01-2010'], ';');
             fclose($file);
         };
 
@@ -260,9 +268,6 @@ class UserController extends Controller
 
     public function bulkDelete(Request $request)
     {
-        if (auth()->user()->role !== 'superadmin') {
-            return back()->with('error', 'Hanya Superadmin yang dapat menghapus anggota masal.');
-        }
 
         // Check if it's from CSV or checkboxes
         if ($request->hasFile('file')) {

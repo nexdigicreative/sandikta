@@ -10,11 +10,9 @@
     </div>
     <div class="d-flex gap-2">
         <!-- Bulk Delete CSV -->
-        @if(auth()->user()->isSuperadmin())
         <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
             <i class="bi bi-trash-fill me-1"></i><span class="d-none d-sm-inline">Hapus Masal</span>
         </button>
-        @endif
         <!-- Import CSV -->
         <button class="btn btn-outline-modern" data-bs-toggle="modal" data-bs-target="#importModal">
             <i class="bi bi-upload me-1"></i><span class="d-none d-sm-inline">Import CSV</span>
@@ -25,24 +23,6 @@
     </div>
 </div>
 
-{{-- Bulk Action Bar (Floating/Hidden) --}}
-@if(auth()->user()->isSuperadmin())
-<div id="bulk-action-bar" class="card-modern mb-4 d-none animate-fadeInUp" style="background: #fff1f2; border-color: #fecdd3;">
-    <div class="card-body py-2 d-flex justify-content-between align-items-center">
-        <div class="text-danger fw-bold" style="font-size: 14px;">
-            <i class="bi bi-check2-square me-2"></i><span id="selected-count">0</span> Anggota Terpilih
-        </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">Batal</button>
-            <form action="{{ route('admin.users.bulk-delete') }}" method="POST" id="bulk-delete-form">
-                @csrf
-                <div id="selected-ids-container"></div>
-                <button type="button" class="btn btn-sm btn-danger" onclick="confirmBulkDelete()">Hapus Semua Terpilih</button>
-            </form>
-        </div>
-    </div>
-</div>
-@endif
 
 <!-- Filter -->
 <div class="card-modern mb-4">
@@ -70,22 +50,16 @@
             <table class="table-modern">
                 <thead>
                     <tr>
-                        @if(auth()->user()->isSuperadmin())
-                        <th style="width: 40px; text-align: center;"><input type="checkbox" id="check-all" class="form-check-input"></th>
-                        @endif
                         <th>NIS</th><th>Nama</th><th>Kelas</th><th>Tgl Lahir</th><th>Status</th><th>Login Terakhir</th><th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($users as $user)
                     <tr class="user-row" data-id="{{ $user->id }}">
-                        @if(auth()->user()->isSuperadmin())
-                        <td class="text-center"><input type="checkbox" class="form-check-input user-checkbox" value="{{ $user->id }}" onchange="updateBulkBar()"></td>
-                        @endif
                         <td><strong>{{ $user->nis }}</strong></td>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->kelas }}</td>
-                        <td>{{ $user->tanggal_lahir?->format('d/m/Y') }}</td>
+                        <td>{{ $user->tanggal_lahir ? \Carbon\Carbon::parse($user->tanggal_lahir)->format('d/m/Y') : '' }}</td>
                         <td>
                             @if($user->is_active)
                             <span class="badge-modern badge-success">Aktif</span>
@@ -105,15 +79,13 @@
                                 <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline" id="reset-pass-{{ $user->id }}">@csrf @method('PATCH')
                                     <button type="button" class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" title="Reset Password" onclick="confirmAction('reset-pass-{{ $user->id }}', 'Reset Password?', 'Password akan direset ke tanggal lahir (DDMMYYYY).', 'warning', 'Ya, Reset!')"><i class="bi bi-key"></i></button>
                                 </form>
-                                @if(auth()->user()->isSuperadmin())
                                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" id="del-user-{{ $user->id }}">@csrf @method('DELETE')</form>
                                 <button class="btn btn-sm btn-outline-danger" style="border-radius:8px;padding:4px 10px" onclick="confirmDelete('del-user-{{ $user->id }}')"><i class="bi bi-trash"></i></button>
-                                @endif
                             </div>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="{{ auth()->user()->isSuperadmin() ? 8 : 7 }}" class="text-center py-4 text-muted">Belum ada user</td></tr>
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Belum ada user</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -128,9 +100,6 @@
         <div class="card-body" style="padding:14px 16px">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div class="d-flex gap-2 align-items-center">
-                    @if(auth()->user()->isSuperadmin())
-                    <input type="checkbox" class="form-check-input user-checkbox" value="{{ $user->id }}" onchange="updateBulkBar()">
-                    @endif
                     <div style="min-width:0">
                         <div style="font-weight:700;font-size:14px">{{ $user->name }}</div>
                         <div style="font-size:12px;color:#64748b">NIS: {{ $user->nis }} • {{ $user->kelas }}</div>
@@ -140,7 +109,7 @@
             </div>
             <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">
                 <i class="bi bi-clock me-1"></i>{{ $user->last_login_at?->diffForHumans() ?? 'Belum login' }}
-                @if($user->tanggal_lahir)<span class="mx-1">•</span><i class="bi bi-calendar me-1"></i>{{ $user->tanggal_lahir->format('d/m/Y') }}@endif
+                @if($user->tanggal_lahir)<span class="mx-1">•</span><i class="bi bi-calendar me-1"></i>{{ \Carbon\Carbon::parse($user->tanggal_lahir)->format('d/m/Y') }}@endif
             </div>
             <div class="d-flex gap-1">
                 <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary flex-fill" style="border-radius:8px"><i class="bi bi-pencil me-1"></i>Edit</a>
@@ -152,10 +121,8 @@
                 <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="d-inline" id="reset-pass-m-{{ $user->id }}">@csrf @method('PATCH')
                     <button type="button" class="btn btn-sm btn-outline-info" style="border-radius:8px;padding:4px 10px" onclick="confirmAction('reset-pass-m-{{ $user->id }}', 'Reset Password?', 'Password akan direset ke tanggal lahir (DDMMYYYY).', 'warning', 'Ya, Reset!')"><i class="bi bi-key"></i></button>
                 </form>
-                @if(auth()->user()->isSuperadmin())
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" id="del-user-m-{{ $user->id }}">@csrf @method('DELETE')</form>
                 <button class="btn btn-sm btn-outline-danger" style="border-radius:8px;padding:4px 10px" onclick="confirmDelete('del-user-m-{{ $user->id }}')"><i class="bi bi-trash"></i></button>
-                @endif
             </div>
         </div>
     </div>
@@ -196,7 +163,6 @@
 </div>
 
 <!-- Bulk Delete Modal -->
-@if(auth()->user()->isSuperadmin())
 <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="border-radius:20px;border:none">
@@ -228,70 +194,5 @@
         </div>
     </div>
 </div>
-@endif
 
-@push('scripts')
-<script>
-    // Checkbox logic
-    const checkAll = document.getElementById('check-all');
-    const userCheckboxes = document.querySelectorAll('.user-checkbox');
-    const bulkBar = document.getElementById('bulk-action-bar');
-    const selectedCountLabel = document.getElementById('selected-count');
-    const idsContainer = document.getElementById('selected-ids-container');
-
-    if (checkAll) {
-        checkAll.addEventListener('change', function() {
-            userCheckboxes.forEach(cb => cb.checked = checkAll.checked);
-            updateBulkBar();
-        });
-    }
-
-    function updateBulkBar() {
-        const checked = document.querySelectorAll('.user-checkbox:checked');
-        const count = checked.length;
-        
-        if (count > 0) {
-            bulkBar.classList.remove('d-none');
-            selectedCountLabel.textContent = count;
-            
-            // Update hidden inputs
-            idsContainer.innerHTML = '';
-            checked.forEach(cb => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'selected_users[]';
-                input.value = cb.value;
-                idsContainer.appendChild(input);
-            });
-        } else {
-            bulkBar.classList.add('d-none');
-            if (checkAll) checkAll.checked = false;
-        }
-    }
-
-    function deselectAll() {
-        userCheckboxes.forEach(cb => cb.checked = false);
-        if (checkAll) checkAll.checked = false;
-        updateBulkBar();
-    }
-
-    function confirmBulkDelete() {
-        const count = document.querySelectorAll('.user-checkbox:checked').length;
-        Swal.fire({
-            title: `Hapus ${count} User?`,
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#e11d48',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ya, Hapus Semua!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('bulk-delete-form').submit();
-            }
-        });
-    }
-</script>
-@endpush
 @endsection

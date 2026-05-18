@@ -2,8 +2,12 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
     <title>{{ $ebook->title }} - Perpus Sandikta Reader</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,7 +26,8 @@
 
         /* ===== TOPBAR ===== */
         .reader-topbar {
-            height:56px; background:rgba(15,23,42,0.95); backdrop-filter:blur(20px);
+            height:56px; background:rgba(15,23,42,0.98);
+            -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
             border-bottom:1px solid rgba(255,255,255,0.08);
             display:flex; align-items:center; justify-content:space-between;
             padding:0 12px; position:fixed; top:0; left:0; right:0; z-index:100;
@@ -110,9 +115,12 @@
         .mobile-bottombar {
             display:none;
             position:fixed; bottom:0; left:0; right:0; z-index:100;
-            background:rgba(15,23,42,0.95); backdrop-filter:blur(20px);
+            background:rgba(15,23,42,0.98);
+            -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
             border-top:1px solid rgba(255,255,255,0.08);
-            padding:10px 16px; padding-bottom: max(10px, env(safe-area-inset-bottom));
+            padding:10px 16px 10px 16px;
+            padding-bottom: calc(10px + constant(safe-area-inset-bottom));
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
 
         .bottombar-main {
@@ -215,7 +223,7 @@
             .watermark-overlay { top:46px; }
             .watermark-text { font-size:12px; }
 
-            .mobile-bottombar { padding:8px 10px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+            .mobile-bottombar { padding:8px 10px 8px 10px; padding-bottom: calc(8px + constant(safe-area-inset-bottom)); padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
             .bottombar-center { padding:5px 10px; gap:8px; }
             .bottombar-page { font-size:13px; min-width:60px; }
             .bottombar-main { gap:8px; }
@@ -304,9 +312,11 @@
         // PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const isMobile = window.innerWidth <= 768;
+        // Cross-browser mobile detection
+        function checkMobile() { return window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth <= 1024); }
+        var isMobile = checkMobile();
 
-        let pdfDoc = null,
+        var pdfDoc = null,
             pageNum = 1,
             pageRendering = false,
             pageNumPending = null,
@@ -339,16 +349,16 @@
                     scale = fitWidthScale;
                 }
 
-                const viewport = page.getViewport({ scale: scale });
+                var viewport = page.getViewport({ scale: scale });
 
                 // Use devicePixelRatio for sharp rendering (cap at 2 for iOS memory limits)
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-                const dpr = Math.min(window.devicePixelRatio || 1, isIOS ? 2 : 3);
-                const maxCanvasArea = isIOS ? 16777216 : 67108864; // 4096x4096 for iOS, 8192x8192 otherwise
-                let renderWidth = viewport.width * dpr;
-                let renderHeight = viewport.height * dpr;
+                var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                var dpr = Math.min(window.devicePixelRatio || 1, isIOS ? 2 : 3);
+                var maxCanvasArea = isIOS ? 16777216 : 67108864; // 4096x4096 for iOS, 8192x8192 otherwise
+                var renderWidth = viewport.width * dpr;
+                var renderHeight = viewport.height * dpr;
                 if (renderWidth * renderHeight > maxCanvasArea) {
-                    const ratio = Math.sqrt(maxCanvasArea / (renderWidth * renderHeight));
+                    var ratio = Math.sqrt(maxCanvasArea / (renderWidth * renderHeight));
                     renderWidth = Math.floor(renderWidth * ratio);
                     renderHeight = Math.floor(renderHeight * ratio);
                 }
@@ -358,11 +368,11 @@
                 canvas.style.height = viewport.height + 'px';
                 ctx.setTransform(renderWidth / viewport.width, 0, 0, renderHeight / viewport.height, 0, 0);
 
-                const renderContext = {
+                var renderContext = {
                     canvasContext: ctx,
                     viewport: viewport
                 };
-                const renderTask = page.render(renderContext);
+                var renderTask = page.render(renderContext);
 
                 renderTask.promise.then(function() {
                     pageRendering = false;
@@ -406,7 +416,7 @@
         }
 
         function updateZoomDisplay() {
-            const pct = Math.round(scale * 100) + '%';
+            var pct = Math.round(scale * 100) + '%';
             document.getElementById('zoom-percent').textContent = pct;
             if (document.getElementById('mob-zoom-percent')) {
                 document.getElementById('mob-zoom-percent').textContent = pct;
@@ -440,8 +450,8 @@
         document.getElementById('mob-zoom-out').addEventListener('click', zoomOut);
 
         // ===== SWIPE GESTURE =====
-        let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
-        const viewer = document.getElementById('viewer-container');
+        var touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+        var viewer = document.getElementById('viewer-container');
 
         viewer.addEventListener('touchstart', function(e) {
             touchStartX = e.changedTouches[0].screenX;
@@ -455,9 +465,9 @@
         }, { passive: true });
 
         function handleSwipe() {
-            const diffX = touchEndX - touchStartX;
-            const diffY = touchEndY - touchStartY;
-            const minSwipe = 80;
+            var diffX = touchEndX - touchStartX;
+            var diffY = touchEndY - touchStartY;
+            var minSwipe = 80;
 
             // Only trigger if horizontal swipe is dominant
             if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipe) {
@@ -486,47 +496,71 @@
         });
 
         // ===== LOAD PDF =====
-        const pdfUrl = '{{ route("pdf.stream", $ebook) }}?token={{ $token }}';
+        var pdfUrl = '{{ route("pdf.stream", $ebook) }}?token={{ $token }}';
 
-        pdfjsLib.getDocument({ url: pdfUrl }).promise.then(function(pdfDoc_) {
-            pdfDoc = pdfDoc_;
-            const totalPages = pdfDoc.numPages;
+        var loadRetries = 0;
+        function loadPdf() {
+            pdfjsLib.getDocument({ url: pdfUrl }).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                var totalPages = pdfDoc.numPages;
 
-            document.getElementById('page-count').textContent = totalPages;
-            if (document.getElementById('mob-page-count')) {
-                document.getElementById('mob-page-count').textContent = totalPages;
-            }
-            document.getElementById('loader').style.display = 'none';
+                document.getElementById('page-count').textContent = totalPages;
+                if (document.getElementById('mob-page-count')) {
+                    document.getElementById('mob-page-count').textContent = totalPages;
+                }
+                document.getElementById('loader').style.display = 'none';
 
-            // Set initial zoom display
-            updateZoomDisplay();
+                updateZoomDisplay();
+                renderPage(pageNum);
 
-            // Render first page
-            renderPage(pageNum);
+                if (isMobile && totalPages > 1) {
+                    var hint = document.getElementById('swipe-hint');
+                    hint.classList.add('show');
+                    setTimeout(function() { hint.classList.remove('show'); }, 3000);
+                }
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                if (loadRetries < 2) {
+                    loadRetries++;
+                    setTimeout(loadPdf, 1500);
+                    return;
+                }
+                document.getElementById('loader').innerHTML =
+                    '<div style="color:#ef4444;text-align:center;padding:20px;">' +
+                    '<i class="bi bi-exclamation-triangle" style="font-size:3rem;display:block;margin-bottom:15px;"></i>' +
+                    '<div style="font-size:16px;font-weight:600;margin-bottom:8px;">Gagal memuat eBook</div>' +
+                    '<div style="font-size:13px;color:#94a3b8;margin-bottom:20px;">Sesi mungkin kadaluwarsa atau file PDF tidak ditemukan di server.</div>' +
+                    '<a href="" class="btn-reader" style="display:inline-flex;margin:0 auto;">' +
+                    '<i class="bi bi-arrow-clockwise"></i> Muat Ulang</a></div>';
+            });
+        }
+        loadPdf();
 
-            // Show swipe hint on mobile
-            if (isMobile && totalPages > 1) {
-                const hint = document.getElementById('swipe-hint');
-                hint.classList.add('show');
-                setTimeout(function() { hint.classList.remove('show'); }, 3000);
-            }
-        }).catch(function(error) {
-            console.error('Error loading PDF:', error);
-            document.getElementById('loader').innerHTML =
-                '<div style="color:#ef4444;text-align:center;padding:20px;">' +
-                '<i class="bi bi-exclamation-triangle" style="font-size:3rem;display:block;margin-bottom:15px;"></i>' +
-                '<div style="font-size:16px;font-weight:600;margin-bottom:8px;">Gagal memuat eBook</div>' +
-                '<div style="font-size:13px;color:#94a3b8;margin-bottom:20px;">Sesi mungkin kadaluwarsa atau file PDF tidak ditemukan di server.</div>' +
-                '<a href="" class="btn-reader" style="display:inline-flex;margin:0 auto;">' +
-                '<i class="bi bi-arrow-clockwise"></i> Muat Ulang</a></div>';
-        });
-
-        // ===== HANDLE RESIZE =====
-        let resizeTimeout;
+        // ===== HANDLE RESIZE (all browsers) =====
+        var resizeTimeout;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
-                if (pdfDoc && isMobile) {
+                isMobile = checkMobile();
+                if (pdfDoc) {
+                    pdfDoc.getPage(pageNum).then(function(page) {
+                        if (isMobile) {
+                            fitWidthScale = calculateFitWidth(page);
+                            scale = fitWidthScale;
+                            updateZoomDisplay();
+                        }
+                        renderPage(pageNum);
+                    });
+                }
+            }, 300);
+        });
+
+        // Handle orientation change for mobile browsers
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                isMobile = checkMobile();
+                if (pdfDoc) {
+                    fitWidthScale = null;
                     pdfDoc.getPage(pageNum).then(function(page) {
                         fitWidthScale = calculateFitWidth(page);
                         scale = fitWidthScale;
@@ -534,7 +568,7 @@
                         renderPage(pageNum);
                     });
                 }
-            }, 250);
+            }, 500);
         });
 
         // ===== SECURITY MEASURES =====
@@ -544,7 +578,7 @@
 
         // Blur on tab switch
         document.addEventListener('visibilitychange', function() {
-            const container = document.getElementById('viewer-container');
+            var container = document.getElementById('viewer-container');
             if (document.hidden) {
                 container.style.filter = 'blur(15px)';
             } else {
@@ -553,11 +587,11 @@
         });
 
         // Basic DevTools detection (skip on iOS/mobile to avoid false positives)
-        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (!isIOSDevice && window.innerWidth > 1024) {
-            let checkCount = 0;
-            const checkDevTools = setInterval(function() {
-                const threshold = 160;
+            var checkCount = 0;
+            var checkDevTools = setInterval(function() {
+                var threshold = 160;
                 if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
                     checkCount++;
                     if(checkCount > 3) {

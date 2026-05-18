@@ -92,6 +92,7 @@ Route::middleware(['auth', 'check.active', 'auto.logout'])->group(function () {
             Route::put('/admins/{admin}', [AdminManagementController::class, 'update'])->name('admins.update');
             Route::patch('/admins/{admin}/toggle', [AdminManagementController::class, 'toggleStatus'])->name('admins.toggle');
             Route::delete('/admins/{admin}', [AdminManagementController::class, 'destroy'])->name('admins.destroy');
+            Route::post('/admins/bulk-delete', [AdminManagementController::class, 'bulkDelete'])->name('admins.bulk-delete');
 
             // Activity logs
             Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');

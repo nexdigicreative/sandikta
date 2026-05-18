@@ -75,4 +75,23 @@ class AdminManagementController extends Controller
         ActivityLog::log('delete_admin', "Hapus admin: {$name}", null, null, 'danger');
         return redirect()->route('superadmin.admins.index')->with('success', 'Admin berhasil dihapus!');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        if (auth()->user()->role !== 'superadmin') {
+            abort(403);
+        }
+
+        if ($request->has('selected_admins')) {
+            $ids = $request->selected_admins;
+            // Ensure we only delete users with role 'admin'
+            $count = User::whereIn('id', $ids)->where('role', 'admin')->count();
+            User::whereIn('id', $ids)->where('role', 'admin')->delete();
+            
+            ActivityLog::log('bulk_delete_admins', "Hapus masal {$count} admin via checkbox", null, null, 'danger');
+            return back()->with('success', "Berhasil menghapus {$count} admin terpilih.");
+        }
+
+        return back()->with('error', 'Tidak ada data yang dipilih.');
+    }
 }

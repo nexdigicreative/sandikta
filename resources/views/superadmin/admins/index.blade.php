@@ -16,7 +16,7 @@
                 <thead><tr><th>Nama</th><th>Email</th><th>Status</th><th>Login Terakhir</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @forelse($admins as $admin)
-                    <tr>
+                    <tr class="admin-row" data-id="{{ $admin->id }}">
                         <td><strong>{{ $admin->name }}</strong></td>
                         <td>{{ $admin->email }}</td>
                         <td>@if($admin->is_active)<span class="badge-modern badge-success">Aktif</span>@else<span class="badge-modern badge-danger">Nonaktif</span>@endif</td>
@@ -76,4 +76,5 @@
 <div class="mt-3 pagination-wrapper">
     {{ $admins->links() }}
 </div>
+
 @endsection
