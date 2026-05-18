@@ -79,12 +79,14 @@
             background:#1e293b; padding:16px;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
+            perspective: 2000px;
+            perspective-origin: center;
         }
 
         #pdf-canvas {
             box-shadow:0 20px 40px -10px rgba(0,0,0,0.5), 0 8px 16px -6px rgba(0,0,0,0.3);
             background:#fff; display:block;
-            border-radius: 2px;
+            border-radius: 4px;
         }
 
         /* ===== LOADING ===== */
@@ -173,12 +175,158 @@
         }
         .swipe-hint.show { opacity:1; }
 
-        /* ===== PAGE TRANSITION ===== */
-        .page-transition {
-            transition: opacity 0.15s ease;
+        /* ===== SLEEK PAGE LOADING BAR ===== */
+        .loading-bar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+            background-size: 200% 100%;
+            animation: loading-bar-ind 1.5s infinite linear;
+            z-index: 105;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .page-transition.fading {
-            opacity: 0.3;
+        .loading-bar.active {
+            opacity: 1;
+        }
+        @keyframes loading-bar-ind {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        @media (max-width: 768px) {
+            .loading-bar { top: 50px; }
+        }
+        @media (max-width: 480px) {
+            .loading-bar { top: 46px; }
+        }
+
+        /* ===== 3D REALISTIC BOOK FLIP TRANSITION (DOUBLE BUFFERED) ===== */
+        #book-viewport {
+            position: relative;
+            perspective: 2500px;
+            perspective-origin: center;
+            margin: 0 auto;
+            transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1), height 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .canvas-wrapper {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0) rotateY(0deg) scale(1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 12px 24px -10px rgba(0,0,0,0.3);
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            border-left: 2px solid rgba(0, 0, 0, 0.08); /* Subtle spine binding line */
+            transform-origin: left center; /* Hinges like a real book spine! */
+            
+            /* GPU Hardware Acceleration */
+            will-change: transform, opacity, filter;
+            
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden; /* iOS safari specific optimization */
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                        opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                        filter 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Active page is normal, visible and clickable */
+        .canvas-wrapper.page-active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 5;
+            transform: translate3d(-50%, 0, 0) rotateY(0deg) scale(1);
+            filter: brightness(1);
+        }
+
+        /* Hidden page is absolute-positioned and hidden */
+        .canvas-wrapper.page-hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            transform: translate3d(-50%, 0, -100px);
+        }
+
+        /* Curl Page Shadow Overlay for realistic paper fold bending */
+        .page-shadow {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            opacity: 0;
+            will-change: opacity;
+            transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 10;
+        }
+
+        /* ===== NEXT PAGE TRANSITIONS ===== */
+        /* Active page turns left (exiting) */
+        .canvas-wrapper.flip-exit-next {
+            transform: translate3d(-50%, 0, 0) rotateY(-110deg) scale(0.92);
+            opacity: 0;
+            filter: brightness(0.4);
+            z-index: 6;
+            pointer-events: none;
+        }
+        .canvas-wrapper.flip-exit-next .page-shadow {
+            opacity: 0.6;
+            background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 25%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.3) 100%);
+        }
+
+        /* Temp page turns to active (entering) */
+        .canvas-wrapper.flip-enter-next {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 5;
+            transform: translate3d(-50%, 0, 0) rotateY(0deg) scale(1);
+            filter: brightness(1);
+        }
+
+        /* ===== PREV PAGE TRANSITIONS ===== */
+        /* Active page scales down slightly (underneath) */
+        .canvas-wrapper.flip-exit-prev {
+            transform: translate3d(-50%, 0, -50px) rotateY(10deg) scale(0.96);
+            opacity: 0.5;
+            filter: brightness(0.7);
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* Temp page turns from left (entering on top) */
+        .canvas-wrapper.flip-enter-prev-start {
+            transform: translate3d(-50%, 0, 0) rotateY(-110deg) scale(0.92);
+            opacity: 0;
+            filter: brightness(0.4);
+            z-index: 7;
+            pointer-events: none;
+        }
+        .canvas-wrapper.flip-enter-prev-start .page-shadow {
+            opacity: 0.6;
+            background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 25%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.3) 100%);
+        }
+
+        .canvas-wrapper.flip-enter-prev-active {
+            transform: translate3d(-50%, 0, 0) rotateY(0deg) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 7;
+        }
+        .canvas-wrapper.flip-enter-prev-active .page-shadow {
+            opacity: 0;
+        }
+
+        /* ===== INITIAL 3D BOOK OPENING ANIMATION ===== */
+        .canvas-wrapper.book-open-init {
+            transform: translate3d(-50%, 0, 0) rotateY(-110deg) scale(0.85) !important;
+            opacity: 0 !important;
+            filter: brightness(0.2) !important;
         }
 
         @media print {
@@ -268,7 +416,21 @@
 
     <!-- ===== VIEWER ===== -->
     <div class="viewer-container" id="viewer-container">
-        <canvas id="pdf-canvas" class="page-transition"></canvas>
+        <!-- Sleek Loading Bar -->
+        <div id="page-loading-bar" class="loading-bar"></div>
+
+        <div id="book-viewport">
+            <!-- Canvas Wrapper 1 -->
+            <div id="canvas-wrapper-1" class="canvas-wrapper page-active book-open-init">
+                <canvas id="pdf-canvas-1"></canvas>
+                <div class="page-shadow"></div>
+            </div>
+            <!-- Canvas Wrapper 2 -->
+            <div id="canvas-wrapper-2" class="canvas-wrapper page-hidden">
+                <canvas id="pdf-canvas-2"></canvas>
+                <div class="page-shadow"></div>
+            </div>
+        </div>
     </div>
 
     <!-- ===== WATERMARK ===== -->
@@ -321,9 +483,12 @@
             pageRendering = false,
             pageNumPending = null,
             scale = isMobile ? 1.0 : 1.5,
-            canvas = document.getElementById('pdf-canvas'),
-            ctx = canvas.getContext('2d'),
             fitWidthScale = null;
+
+        var activeWrapper = document.getElementById('canvas-wrapper-1');
+        var tempWrapper = document.getElementById('canvas-wrapper-2');
+        var isFirstLoad = true;
+        var turnDirection = 'next';
 
         /**
          * Calculate scale to fit page width in viewport
@@ -336,11 +501,91 @@
         }
 
         /**
-         * Render a page with smooth transition
+         * Update all page counters
          */
-        function renderPage(num) {
+        function updatePageCounters(num) {
+            document.getElementById('page-num').textContent = num;
+            if (document.getElementById('mob-page-num')) {
+                document.getElementById('mob-page-num').textContent = num;
+            }
+        }
+
+        /**
+         * Render a page directly (used for first load, zoom, and resizing)
+         */
+        function renderPageDirect(num) {
+            if (pageRendering) return;
             pageRendering = true;
-            canvas.classList.add('fading');
+
+            const loadingBar = document.getElementById('page-loading-bar');
+            loadingBar.classList.add('active');
+
+            var targetCanvas = activeWrapper.querySelector('canvas');
+            var targetCtx = targetCanvas.getContext('2d');
+
+            pdfDoc.getPage(num).then(function(page) {
+                var viewport = page.getViewport({ scale: scale });
+                var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                var dpr = Math.min(window.devicePixelRatio || 1, isIOS ? 2 : 3);
+                var maxCanvasArea = isIOS ? 16777216 : 67108864;
+                var renderWidth = viewport.width * dpr;
+                var renderHeight = viewport.height * dpr;
+                if (renderWidth * renderHeight > maxCanvasArea) {
+                    var ratio = Math.sqrt(maxCanvasArea / (renderWidth * renderHeight));
+                    renderWidth = Math.floor(renderWidth * ratio);
+                    renderHeight = Math.floor(renderHeight * ratio);
+                }
+                
+                targetCanvas.height = renderHeight;
+                targetCanvas.width = renderWidth;
+                targetCanvas.style.width = viewport.width + 'px';
+                targetCanvas.style.height = viewport.height + 'px';
+                targetCtx.setTransform(renderWidth / viewport.width, 0, 0, renderHeight / viewport.height, 0, 0);
+
+                activeWrapper.style.width = viewport.width + 'px';
+                activeWrapper.style.height = viewport.height + 'px';
+
+                const vp = document.getElementById('book-viewport');
+                vp.style.width = viewport.width + 'px';
+                vp.style.height = viewport.height + 'px';
+
+                var renderContext = {
+                    canvasContext: targetCtx,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    loadingBar.classList.remove('active');
+                });
+            }).catch(function(err) {
+                console.error("Direct render error:", err);
+                pageRendering = false;
+                loadingBar.classList.remove('active');
+            });
+        }
+
+        /**
+         * Render a page with double-buffered smooth transition
+         */
+        function renderPageDoubleBuffered(num, direction) {
+            if (pageRendering) {
+                pageNumPending = num;
+                return;
+            }
+
+            pageRendering = true;
+            turnDirection = direction || 'next';
+
+            // Show sleek loading bar
+            const loadingBar = document.getElementById('page-loading-bar');
+            loadingBar.classList.add('active');
+
+            // Render to tempWrapper (which is hidden)
+            var targetWrapper = isFirstLoad ? activeWrapper : tempWrapper;
+            var targetCanvas = targetWrapper.querySelector('canvas');
+            var targetCtx = targetCanvas.getContext('2d');
 
             pdfDoc.getPage(num).then(function(page) {
                 // Auto fit-width on first load for mobile
@@ -351,10 +596,10 @@
 
                 var viewport = page.getViewport({ scale: scale });
 
-                // Use devicePixelRatio for sharp rendering (cap at 2 for iOS memory limits)
+                // Use devicePixelRatio for sharp rendering
                 var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
                 var dpr = Math.min(window.devicePixelRatio || 1, isIOS ? 2 : 3);
-                var maxCanvasArea = isIOS ? 16777216 : 67108864; // 4096x4096 for iOS, 8192x8192 otherwise
+                var maxCanvasArea = isIOS ? 16777216 : 67108864;
                 var renderWidth = viewport.width * dpr;
                 var renderHeight = viewport.height * dpr;
                 if (renderWidth * renderHeight > maxCanvasArea) {
@@ -362,57 +607,138 @@
                     renderWidth = Math.floor(renderWidth * ratio);
                     renderHeight = Math.floor(renderHeight * ratio);
                 }
-                canvas.height = renderHeight;
-                canvas.width = renderWidth;
-                canvas.style.width = viewport.width + 'px';
-                canvas.style.height = viewport.height + 'px';
-                ctx.setTransform(renderWidth / viewport.width, 0, 0, renderHeight / viewport.height, 0, 0);
+                
+                targetCanvas.height = renderHeight;
+                targetCanvas.width = renderWidth;
+                targetCanvas.style.width = viewport.width + 'px';
+                targetCanvas.style.height = viewport.height + 'px';
+                targetCtx.setTransform(renderWidth / viewport.width, 0, 0, renderHeight / viewport.height, 0, 0);
+
+                targetWrapper.style.width = viewport.width + 'px';
+                targetWrapper.style.height = viewport.height + 'px';
 
                 var renderContext = {
-                    canvasContext: ctx,
+                    canvasContext: targetCtx,
                     viewport: viewport
                 };
                 var renderTask = page.render(renderContext);
 
                 renderTask.promise.then(function() {
                     pageRendering = false;
-                    canvas.classList.remove('fading');
+                    loadingBar.classList.remove('active');
 
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
+                    if (isFirstLoad) {
+                        // First load: swing open active page
+                        activeWrapper.classList.remove('page-hidden');
+                        activeWrapper.classList.add('page-active');
+                        
+                        const vp = document.getElementById('book-viewport');
+                        vp.style.width = viewport.width + 'px';
+                        vp.style.height = viewport.height + 'px';
+
+                        setTimeout(function() {
+                            activeWrapper.classList.remove('book-open-init');
+                        }, 50);
+                        isFirstLoad = false;
+                        
+                        if (pageNumPending !== null) {
+                            var pendingNum = pageNumPending;
+                            pageNumPending = null;
+                            renderPageDoubleBuffered(pendingNum, turnDirection);
+                        }
+                    } else {
+                        // Trigger the page turn transition
+                        animatePageTurn(direction);
                     }
                 });
+            }).catch(function(err) {
+                console.error("Double-buffered render error:", err);
+                pageRendering = false;
+                loadingBar.classList.remove('active');
             });
 
-            // Update all page counters
-            document.getElementById('page-num').textContent = num;
-            if (document.getElementById('mob-page-num')) {
-                document.getElementById('mob-page-num').textContent = num;
-            }
-
-            // Scroll to top on page change (iOS compatible)
-            try { document.getElementById('viewer-container').scrollTo({ top: 0, behavior: 'instant' }); } catch(e) { document.getElementById('viewer-container').scrollTop = 0; }
+            // Update page counters immediately to feel responsive
+            updatePageCounters(num);
         }
 
-        function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
+        /**
+         * Perform the realistic 3D page turn transition
+         */
+        function animatePageTurn(direction) {
+            const viewport = document.getElementById('book-viewport');
+            
+            // Set viewport size to the new page's size (tempWrapper size)
+            viewport.style.width = tempWrapper.style.width;
+            viewport.style.height = tempWrapper.style.height;
+
+            if (direction === 'next') {
+                // NEXT TRANSITION: Active turns left, Temp becomes active
+                // 1. Prepare tempWrapper: position it centered, opacity 1 (enters behind active)
+                tempWrapper.className = 'canvas-wrapper flip-enter-next';
+                
+                // Force layout recalculation
+                tempWrapper.offsetHeight;
+
+                // 2. Animate activeWrapper: flip to left
+                activeWrapper.className = 'canvas-wrapper flip-exit-next';
+
+                // Wait for the transition to complete (600ms)
+                setTimeout(finalizeTransition, 600);
+
             } else {
-                renderPage(num);
+                // PREV TRANSITION: Temp flips in from left on top of Active
+                // 1. Prepare tempWrapper: rotated left on top
+                tempWrapper.className = 'canvas-wrapper flip-enter-prev-start';
+                
+                // Force layout recalculation
+                tempWrapper.offsetHeight;
+
+                // 2. Start transition
+                activeWrapper.className = 'canvas-wrapper flip-exit-prev';
+                tempWrapper.className = 'canvas-wrapper flip-enter-prev-active';
+
+                // Wait for the transition to complete (600ms)
+                setTimeout(finalizeTransition, 600);
+            }
+
+            function finalizeTransition() {
+                // Swap active and temp references
+                const oldActive = activeWrapper;
+                activeWrapper = tempWrapper;
+                tempWrapper = oldActive;
+
+                // Set clean classes
+                activeWrapper.className = 'canvas-wrapper page-active';
+                tempWrapper.className = 'canvas-wrapper page-hidden';
+
+                // Scroll to top of viewer (smoothly or instantly)
+                try {
+                    document.getElementById('viewer-container').scrollTo({ top: 0, behavior: 'instant' });
+                } catch (e) {
+                    document.getElementById('viewer-container').scrollTop = 0;
+                }
+
+                // If there's a pending page render, do it now
+                if (pageNumPending !== null) {
+                    var pendingNum = pageNumPending;
+                    pageNumPending = null;
+                    renderPageDoubleBuffered(pendingNum, turnDirection);
+                }
             }
         }
 
         function onPrevPage() {
             if (pageNum <= 1) return;
+            turnDirection = 'prev';
             pageNum--;
-            queueRenderPage(pageNum);
+            renderPageDoubleBuffered(pageNum, 'prev');
         }
 
         function onNextPage() {
             if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
+            turnDirection = 'next';
             pageNum++;
-            queueRenderPage(pageNum);
+            renderPageDoubleBuffered(pageNum, 'next');
         }
 
         function updateZoomDisplay() {
@@ -427,14 +753,14 @@
             if (scale >= 4.0) return;
             scale += 0.25;
             updateZoomDisplay();
-            queueRenderPage(pageNum);
+            renderPageDirect(pageNum);
         }
 
         function zoomOut() {
             if (scale <= 0.5) return;
             scale -= 0.25;
             updateZoomDisplay();
-            queueRenderPage(pageNum);
+            renderPageDirect(pageNum);
         }
 
         // Desktop controls
@@ -511,7 +837,7 @@
                 document.getElementById('loader').style.display = 'none';
 
                 updateZoomDisplay();
-                renderPage(pageNum);
+                renderPageDoubleBuffered(pageNum, 'next');
 
                 if (isMobile && totalPages > 1) {
                     var hint = document.getElementById('swipe-hint');
@@ -549,7 +875,7 @@
                             scale = fitWidthScale;
                             updateZoomDisplay();
                         }
-                        renderPage(pageNum);
+                        renderPageDirect(pageNum);
                     });
                 }
             }, 300);
@@ -565,7 +891,7 @@
                         fitWidthScale = calculateFitWidth(page);
                         scale = fitWidthScale;
                         updateZoomDisplay();
-                        renderPage(pageNum);
+                        renderPageDirect(pageNum);
                     });
                 }
             }, 500);

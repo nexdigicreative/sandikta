@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'auto.logout' => \App\Http\Middleware\AutoLogoutIdle::class,
         ]);
 
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackVisits::class,
+        ]);
+
         $middleware->append(\App\Http\Middleware\SecureHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

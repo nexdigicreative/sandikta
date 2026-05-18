@@ -72,7 +72,7 @@
                 <div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;transition:all .3s;cursor:pointer" 
                      onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,0.08)'" 
                      onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div style="height:140px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center">
+                    <div style="aspect-ratio:3/4;width:100%;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;overflow:hidden">
                         @if($ebook->cover_image)
                         <img src="{{ asset('storage/'.$ebook->cover_image) }}" style="width:100%;height:100%;object-fit:cover" alt="">
                         @else

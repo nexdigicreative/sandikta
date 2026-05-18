@@ -1089,6 +1089,45 @@
                 cancelButtonText: 'Batal'
             }).then(r => { if (r.isConfirmed) document.getElementById(formId).submit(); });
         }
+
+        // Real-time Dashboard Auto-Refresh
+        @if(request()->routeIs('superadmin.dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('user.dashboard'))
+        setInterval(() => {
+            fetch(window.location.href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector('.content-area');
+                
+                if (newContent) {
+                    // Destroy charts if they exist to prevent memory leaks and duplication
+                    if (typeof Chart !== 'undefined') {
+                        Object.values(Chart.instances).forEach(chart => chart.destroy());
+                    }
+                    
+                    // Replace content seamlessly
+                    document.querySelector('.content-area').innerHTML = newContent.innerHTML;
+                    
+                    // Re-execute dashboard scripts to re-initialize charts with new data
+                    const newScripts = doc.querySelectorAll('script.dashboard-script');
+                    newScripts.forEach(script => {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = script.textContent;
+                        newScript.className = 'dashboard-script';
+                        document.body.appendChild(newScript);
+                        // Clean up right after execution
+                        setTimeout(() => newScript.remove(), 100);
+                    });
+                }
+            })
+            .catch(err => console.error('Dashboard refresh failed:', err));
+        }, 10000); // 10 seconds refresh rate
+        @endif
     </script>
     @stack('scripts')
 </body>

@@ -6,7 +6,7 @@
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card-modern animate-fadeInUp delay-1" style="overflow:hidden">
-            <div style="height:320px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center">
+            <div style="aspect-ratio:3/4;width:100%;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;overflow:hidden">
                 @if($ebook->cover_image)
                 <img src="{{ asset('storage/'.$ebook->cover_image) }}" style="width:100%;height:100%;object-fit:cover" alt="">
                 @else
@@ -77,7 +77,7 @@
     @foreach($relatedEbooks as $rel)
     <div class="col-xl-3 col-md-6">
         <div class="card-modern" style="transition:all .3s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-            <div style="height:140px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center">
+            <div style="aspect-ratio:3/4;width:100%;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;overflow:hidden">
                 @if($rel->cover_image)
                 <img src="{{ asset('storage/'.$rel->cover_image) }}" style="width:100%;height:100%;object-fit:cover" alt="">
                 @else

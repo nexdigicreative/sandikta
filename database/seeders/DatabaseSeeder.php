@@ -31,39 +31,7 @@ class DatabaseSeeder extends Seeder
             'must_change_password' => false,
         ]);
 
-        // Sample Users/Murid
-        User::create([
-            'nis' => '10001',
-            'name' => 'Budi Santoso',
-            'kelas' => 'XII RPL 1',
-            'tanggal_lahir' => '2008-05-15',
-            'password' => Hash::make('15052008'), // ddmmyyyy
-            'role' => 'user',
-            'is_active' => true,
-            'must_change_password' => true,
-        ]);
 
-        User::create([
-            'nis' => '10002',
-            'name' => 'Siti Nurhaliza',
-            'kelas' => 'XII RPL 1',
-            'tanggal_lahir' => '2008-08-20',
-            'password' => Hash::make('20082008'),
-            'role' => 'user',
-            'is_active' => true,
-            'must_change_password' => true,
-        ]);
-
-        User::create([
-            'nis' => '10003',
-            'name' => 'Ahmad Fadillah',
-            'kelas' => 'XI TKJ 2',
-            'tanggal_lahir' => '2009-01-10',
-            'password' => Hash::make('10012009'),
-            'role' => 'user',
-            'is_active' => true,
-            'must_change_password' => true,
-        ]);
 
         // Categories
         $categories = [

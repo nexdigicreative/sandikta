@@ -36,7 +36,7 @@
     @forelse($ebooks as $ebook)
     <div class="col-xl-3 col-lg-4 col-md-6">
         <div class="card-modern h-100" style="transition:all .3s" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 15px 35px rgba(30,64,175,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-            <div style="height:180px;background:linear-gradient(135deg,#1e40af,#3b82f6);position:relative;overflow:hidden">
+            <div style="aspect-ratio:3/4;width:100%;background:linear-gradient(135deg,#1e40af,#3b82f6);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center">
                 @if($ebook->cover_image)
                 <img src="{{ asset('storage/'.$ebook->cover_image) }}" style="width:100%;height:100%;object-fit:cover" alt="">
                 @else
