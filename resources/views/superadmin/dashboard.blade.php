@@ -5,7 +5,7 @@
 @section('content')
 <!-- Stats Row -->
 <div class="row g-3 g-md-4 mb-4">
-    <div class="col-xl-2 col-md-4 col-6">
+    <div class="col-xl-3 col-md-6">
         <div class="stat-card animate-fadeInUp delay-1">
             <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-blue"><i class="bi bi-people-fill"></i></div>
@@ -14,7 +14,7 @@
             <div class="stat-label">Total Murid</div>
         </div>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
+    <div class="col-xl-3 col-md-6">
         <div class="stat-card animate-fadeInUp delay-2">
             <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-purple"><i class="bi bi-person-gear"></i></div>
@@ -23,7 +23,7 @@
             <div class="stat-label">Total Admin</div>
         </div>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
+    <div class="col-xl-3 col-md-6">
         <div class="stat-card animate-fadeInUp delay-3">
             <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-cyan"><i class="bi bi-journal-richtext"></i></div>
@@ -32,26 +32,8 @@
             <div class="stat-label">Total eBook</div>
         </div>
     </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="stat-card animate-fadeInUp delay-1">
-            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
-                <div class="stat-icon bg-gradient-emerald"><i class="bi bi-person-check"></i></div>
-            </div>
-            <div class="stat-value">{{ $activeUsers }}</div>
-            <div class="stat-label">User Aktif</div>
-        </div>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="stat-card animate-fadeInUp delay-2">
-            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
-                <div class="stat-icon bg-gradient-rose"><i class="bi bi-person-x"></i></div>
-            </div>
-            <div class="stat-value">{{ $inactiveUsers }}</div>
-            <div class="stat-label">User Nonaktif</div>
-        </div>
-    </div>
-    <div class="col-xl-2 col-md-4 col-6">
-        <div class="stat-card animate-fadeInUp delay-3">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card animate-fadeInUp delay-4">
             <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3">
                 <div class="stat-icon bg-gradient-amber"><i class="bi bi-eye"></i></div>
             </div>
@@ -94,187 +76,10 @@
     </div>
 </div>
 
-<!-- Visitor Section Header -->
-<div class="d-flex justify-content-between align-items-center mb-3 mt-4 animate-fadeInUp">
-    <h5 class="mb-0" style="font-weight: 700; color: var(--text-primary);"><i class="bi bi-people-fill me-2 text-primary"></i>Statistik & Analitik Pengunjung</h5>
-    <span class="badge-modern badge-info"><i class="bi bi-calendar-event me-1"></i>Realtime Traffic</span>
-</div>
-
-<!-- Visitor Stats Row -->
-<div class="row g-3 g-md-4 mb-4">
-    <!-- Stat 1 -->
-    <div class="col-xl-3 col-sm-6">
-        <div class="stat-card animate-fadeInUp delay-1">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="stat-icon bg-gradient-blue"><i class="bi bi-eye"></i></div>
-            </div>
-            <div class="stat-value">{{ number_format($totalPageviews) }}</div>
-            <div class="stat-label">Total Kunjungan Halaman</div>
-        </div>
-    </div>
-    <!-- Stat 2 -->
-    <div class="col-xl-3 col-sm-6">
-        <div class="stat-card animate-fadeInUp delay-2">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="stat-icon bg-gradient-purple"><i class="bi bi-people"></i></div>
-            </div>
-            <div class="stat-value">{{ number_format($totalUniqueVisitors) }}</div>
-            <div class="stat-label">Total Pengunjung Unik</div>
-        </div>
-    </div>
-    <!-- Stat 3 -->
-    <div class="col-xl-3 col-sm-6">
-        <div class="stat-card animate-fadeInUp delay-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="stat-icon bg-gradient-cyan"><i class="bi bi-graph-up-arrow"></i></div>
-            </div>
-            <div class="stat-value">{{ number_format($todayPageviews) }}</div>
-            <div class="stat-label">Kunjungan Hari Ini</div>
-        </div>
-    </div>
-    <!-- Stat 4 -->
-    <div class="col-xl-3 col-sm-6">
-        <div class="stat-card animate-fadeInUp delay-1">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="stat-icon bg-gradient-emerald"><i class="bi bi-person-heart"></i></div>
-            </div>
-            <div class="stat-value">{{ number_format($todayUniqueVisitors) }}</div>
-            <div class="stat-label">Pengunjung Unik Hari Ini</div>
-        </div>
-    </div>
-</div>
-
-<!-- Visitor Charts and Distribution -->
-<div class="row g-4 mb-4">
-    <!-- Visitor Line Chart -->
-    <div class="col-lg-8">
-        <div class="card-modern animate-fadeInUp delay-2">
-            <div class="card-header">
-                <h6><i class="bi bi-activity me-2 text-primary"></i>Tren Kunjungan Pengunjung (10 Hari Terakhir)</h6>
-            </div>
-            <div class="card-body">
-                <canvas id="visitorChart" style="max-height:280px;width:100%"></canvas>
-            </div>
-        </div>
-    </div>
-    <!-- Distributions (Browser / OS / Device) -->
-    <div class="col-lg-4">
-        <div class="card-modern animate-fadeInUp delay-3">
-            <div class="card-header">
-                <h6><i class="bi bi-laptop me-2 text-warning"></i>Distribusi Sistem & Perangkat</h6>
-            </div>
-            <div class="card-body">
-                <!-- Nav tabs for distribution -->
-                <ul class="nav nav-tabs nav-tabs-modern mb-3" id="distTabs" role="tablist" style="border-bottom: 2px solid var(--border-color)">
-                    <li class="nav-item" role="presentation" style="flex: 1; text-align: center;">
-                        <button class="nav-link active py-2" id="browser-tab" data-bs-toggle="tab" data-bs-target="#browser-pane" type="button" role="tab" style="width: 100%; font-weight: 600; font-size: 12px; border: none; background: transparent; transition: var(--transition)">Browser</button>
-                    </li>
-                    <li class="nav-item" role="presentation" style="flex: 1; text-align: center;">
-                        <button class="nav-link py-2" id="os-tab" data-bs-toggle="tab" data-bs-target="#os-pane" type="button" role="tab" style="width: 100%; font-weight: 600; font-size: 12px; border: none; background: transparent; transition: var(--transition)">OS</button>
-                    </li>
-                    <li class="nav-item" role="presentation" style="flex: 1; text-align: center;">
-                        <button class="nav-link py-2" id="device-tab" data-bs-toggle="tab" data-bs-target="#device-pane" type="button" role="tab" style="width: 100%; font-weight: 600; font-size: 12px; border: none; background: transparent; transition: var(--transition)">Perangkat</button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="distTabsContent">
-                    <!-- Browser Tab Pane -->
-                    <div class="tab-pane fade show active" id="browser-pane" role="tabpanel">
-                        @php $totalBrowsers = $browserStats->sum('total') ?: 1; @endphp
-                        @foreach($browserStats->take(5) as $stat)
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1" style="font-size: 12px; font-weight: 600">
-                                <span>{{ $stat->browser ?: 'Other' }}</span>
-                                <span class="text-muted">{{ round(($stat->total / $totalBrowsers) * 100) }}% ({{ $stat->total }})</span>
-                            </div>
-                            <div class="progress" style="height: 6px; border-radius: 3px; background-color: #f1f5f9">
-                                <div class="progress-bar" role="progressbar" style="width: {{ ($stat->total / $totalBrowsers) * 100 }}%; border-radius: 3px; background: var(--primary-gradient)"></div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    <!-- OS Tab Pane -->
-                    <div class="tab-pane fade" id="os-pane" role="tabpanel">
-                        @php $totalPlatforms = $platformStats->sum('total') ?: 1; @endphp
-                        @foreach($platformStats->take(5) as $stat)
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1" style="font-size: 12px; font-weight: 600">
-                                <span>{{ $stat->platform ?: 'Other' }}</span>
-                                <span class="text-muted">{{ round(($stat->total / $totalPlatforms) * 100) }}% ({{ $stat->total }})</span>
-                            </div>
-                            <div class="progress" style="height: 6px; border-radius: 3px; background-color: #f1f5f9">
-                                <div class="progress-bar" role="progressbar" style="width: {{ ($stat->total / $totalPlatforms) * 100 }}%; border-radius: 3px; background: linear-gradient(135deg, #06b6d4, #0891b2)"></div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    <!-- Device Tab Pane -->
-                    <div class="tab-pane fade" id="device-pane" role="tabpanel">
-                        @php $totalDevices = $deviceStats->sum('total') ?: 1; @endphp
-                        @foreach($deviceStats->take(5) as $stat)
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1" style="font-size: 12px; font-weight: 600">
-                                <span>{{ $stat->device ?: 'Other' }}</span>
-                                <span class="text-muted">{{ round(($stat->total / $totalDevices) * 100) }}% ({{ $stat->total }})</span>
-                            </div>
-                            <div class="progress" style="height: 6px; border-radius: 3px; background-color: #f1f5f9">
-                                <div class="progress-bar" role="progressbar" style="width: {{ ($stat->total / $totalDevices) * 100 }}%; border-radius: 3px; background: linear-gradient(135deg, #8b5cf6, #6d28d9)"></div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Top Visited Pages Row -->
-<div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="card-modern animate-fadeInUp delay-3">
-            <div class="card-header">
-                <h6><i class="bi bi-file-earmark-bar-graph me-2 text-success"></i>Halaman Paling Sering Dikunjungi</h6>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table-modern align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th style="width: 5%">No</th>
-                                <th style="width: 70%">URL Halaman</th>
-                                <th style="text-align: center; width: 25%">Jumlah Kunjungan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($topPages as $i => $page)
-                            <tr>
-                                <td>
-                                    <div style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;background:{{ ['#3b82f6','#8b5cf6','#f59e0b','#10b981','#f43f5e'][$i] ?? '#64748b' }}">{{ $i+1 }}</div>
-                                </td>
-                                <td>
-                                    <code class="text-primary" style="font-size: 13px; font-weight: 600">{{ $page->url }}</code>
-                                </td>
-                                <td style="text-align: center;">
-                                    <span class="badge-modern badge-info" style="font-size:12px;padding:5px 12px;font-weight:700">{{ number_format($page->total) }}x Kunjungan</span>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">Belum ada aktivitas kunjungan halaman</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Live Reading Stats & Top Readers Header -->
 <div class="d-flex justify-content-between align-items-center mb-3 mt-4 animate-fadeInUp">
     <h5 class="mb-0" style="font-weight: 700; color: var(--text-primary);"><i class="bi bi-book-half me-2 text-primary"></i>Aktivitas & Kinerja Membaca</h5>
-    <span class="badge-modern badge-success"><span class="spinner-grow spinner-grow-sm me-1" role="status" style="width:10px;height:10px;animation-duration:1.5s"></span>Active Readers</span>
+    <span class="badge-modern badge-success"><span class="spinner-grow spinner-grow-sm me-1" role="status" style="width:10px;height:10px;animation-duration:1.5s"></span>Live</span>
 </div>
 
 <!-- Live Reading Stats & Top Readers -->
@@ -282,10 +87,7 @@
     <!-- Live Reading Stats -->
     <div class="col-lg-8">
         <div class="card-modern h-100 animate-fadeInUp delay-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6><i class="bi bi-book-half me-2 text-primary"></i>Statistik Aktivitas Membaca Murid</h6>
-                <span class="badge-modern badge-success"><span class="spinner-grow spinner-grow-sm me-1" role="status" style="width:10px;height:10px;animation-duration:1.5s"></span>Live Updates</span>
-            </div>
+            <div class="card-header"><h6><i class="bi bi-book-half me-2 text-primary"></i>Aktivitas Membaca Murid</h6></div>
             <div class="card-body">
                 <!-- Reading Stats Mini Summary -->
                 <div class="row g-3 mb-4">
@@ -434,7 +236,6 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script class="dashboard-script">
-// Reading Stats Chart
 new Chart(document.getElementById('readingChart'), {
     type: 'bar',
     data: {
@@ -455,82 +256,6 @@ new Chart(document.getElementById('readingChart'), {
         scales: {
             y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
             x: { grid: { display: false }, ticks: { font: { size: 11 } } }
-        }
-    }
-});
-
-// Visitor Stats Chart
-const visitorCtx = document.getElementById('visitorChart').getContext('2d');
-const visitorGradientPageviews = visitorCtx.createLinearGradient(0, 0, 0, 200);
-visitorGradientPageviews.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
-visitorGradientPageviews.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-
-const visitorGradientUnique = visitorCtx.createLinearGradient(0, 0, 0, 200);
-visitorGradientUnique.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
-visitorGradientUnique.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
-
-new Chart(document.getElementById('visitorChart'), {
-    type: 'line',
-    data: {
-        labels: {!! json_encode($visitorChartLabels) !!},
-        datasets: [
-            {
-                label: 'Kunjungan Halaman',
-                data: {!! json_encode($visitorChartPageviews) !!},
-                borderColor: '#3b82f6',
-                backgroundColor: visitorGradientPageviews,
-                fill: true,
-                tension: 0.35,
-                borderWidth: 3,
-                pointBackgroundColor: '#3b82f6',
-                pointHoverRadius: 6
-            },
-            {
-                label: 'Pengunjung Unik',
-                data: {!! json_encode($visitorChartUnique) !!},
-                borderColor: '#8b5cf6',
-                backgroundColor: visitorGradientUnique,
-                fill: true,
-                tension: 0.35,
-                borderWidth: 3,
-                pointBackgroundColor: '#8b5cf6',
-                pointHoverRadius: 6
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    font: {
-                        family: "'Inter', sans-serif",
-                        size: 11,
-                        weight: '600'
-                    },
-                    boxWidth: 10,
-                    boxHeight: 10,
-                    borderRadius: 3
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: '#f1f5f9' },
-                ticks: {
-                    font: { family: "'Inter', sans-serif", size: 10, weight: '500' }
-                }
-            },
-            x: {
-                grid: { display: false },
-                ticks: {
-                    font: { family: "'Inter', sans-serif", size: 10, weight: '500' }
-                }
-            }
         }
     }
 });

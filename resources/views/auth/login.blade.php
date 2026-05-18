@@ -322,12 +322,27 @@
                 <button type="submit" class="btn-login">
                     <i class="bi bi-box-arrow-in-right me-2"></i>Masuk
                 </button>
+
+                <div class="mt-4 text-center">
+                    <p style="color: rgba(255, 255, 255, 0.7); font-size: 13px; font-weight: 600; margin-bottom: 12px;">Demo Login:</p>
+                    <div class="d-flex flex-column gap-2">
+                        <button type="button" class="btn btn-sm" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #6ee7b7; border-radius: 10px;" onclick="fillDemo('superadmin@sandikta.sch.id', 'superadmin123')">Superadmin</button>
+                        <button type="button" class="btn btn-sm" style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; border-radius: 10px;" onclick="fillDemo('admin@sandikta.sch.id', 'admin123')">Admin</button>
+                        <button type="button" class="btn btn-sm" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5); color: #fcd34d; border-radius: 10px;" onclick="fillDemo('220001', 'password123')">Siswa (User)</button>
+                    </div>
+                </div>
             </form>
             <div class="login-footer">
                 &copy; {{ date('Y') }} Perpus Sandikta. All rights reserved.
             </div>
         </div>
     </div>
+    <script>
+        function fillDemo(username, password) {
+            document.querySelector('input[name="username"]').value = username;
+            document.querySelector('input[name="password"]').value = password;
+        }
+    </script>
 </body>
 
 </html>

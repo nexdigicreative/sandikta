@@ -17,8 +17,6 @@ class DashboardController extends Controller
         $totalUsers = User::where('role', 'user')->count();
         $totalAdmins = User::where('role', 'admin')->count();
         $totalEbooks = Ebook::count();
-        $activeUsers = User::where('role', 'user')->where('is_active', true)->count();
-        $inactiveUsers = User::where('role', 'user')->where('is_active', false)->count();
         $totalReads = ReadingHistory::count();
         
         $recentActivities = ActivityLog::with('user')
@@ -68,53 +66,10 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Visitor Statistics
-        $totalPageviews = Visit::count();
-        $totalUniqueVisitors = Visit::distinct('ip_address')->count('ip_address');
-        $todayPageviews = Visit::whereDate('created_at', today())->count();
-        $todayUniqueVisitors = Visit::whereDate('created_at', today())->distinct('ip_address')->count('ip_address');
-
-        // Last 10 days of pageviews and unique visitors
-        $visitorChartLabels = [];
-        $visitorChartPageviews = [];
-        $visitorChartUnique = [];
-        for ($i = 9; $i >= 0; $i--) {
-            $date = today()->subDays($i);
-            $visitorChartLabels[] = $date->format('d M');
-            $visitorChartPageviews[] = Visit::whereDate('created_at', $date)->count();
-            $visitorChartUnique[] = Visit::whereDate('created_at', $date)->distinct('ip_address')->count('ip_address');
-        }
-
-        // Distributions
-        $browserStats = Visit::selectRaw('browser, count(*) as total')
-            ->groupBy('browser')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        $platformStats = Visit::selectRaw('platform, count(*) as total')
-            ->groupBy('platform')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        $deviceStats = Visit::selectRaw('device, count(*) as total')
-            ->groupBy('device')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        $topPages = Visit::selectRaw('url, count(*) as total')
-            ->groupBy('url')
-            ->orderBy('total', 'desc')
-            ->take(5)
-            ->get();
-
         return view('superadmin.dashboard', compact(
-            'totalUsers', 'totalAdmins', 'totalEbooks', 'activeUsers', 
-            'inactiveUsers', 'totalReads', 'recentActivities', 'recentEbooks',
-            'topEbooks', 'chartData', 'months', 'totalReadingHours',
-            'activeReadersCount', 'topReaders', 'recentReads',
-            'totalPageviews', 'totalUniqueVisitors', 'todayPageviews', 'todayUniqueVisitors',
-            'visitorChartLabels', 'visitorChartPageviews', 'visitorChartUnique',
-            'browserStats', 'platformStats', 'deviceStats', 'topPages'
+            'totalUsers', 'totalAdmins', 'totalEbooks', 'totalReads',
+            'recentActivities', 'recentEbooks', 'topEbooks', 'chartData', 'months',
+            'totalReadingHours', 'activeReadersCount', 'topReaders', 'recentReads'
         ));
     }
 
@@ -171,52 +126,10 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Visitor Statistics
-        $totalPageviews = Visit::count();
-        $totalUniqueVisitors = Visit::distinct('ip_address')->count('ip_address');
-        $todayPageviews = Visit::whereDate('created_at', today())->count();
-        $todayUniqueVisitors = Visit::whereDate('created_at', today())->distinct('ip_address')->count('ip_address');
-
-        // Last 10 days of pageviews and unique visitors
-        $visitorChartLabels = [];
-        $visitorChartPageviews = [];
-        $visitorChartUnique = [];
-        for ($i = 9; $i >= 0; $i--) {
-            $date = today()->subDays($i);
-            $visitorChartLabels[] = $date->format('d M');
-            $visitorChartPageviews[] = Visit::whereDate('created_at', $date)->count();
-            $visitorChartUnique[] = Visit::whereDate('created_at', $date)->distinct('ip_address')->count('ip_address');
-        }
-
-        // Distributions
-        $browserStats = Visit::selectRaw('browser, count(*) as total')
-            ->groupBy('browser')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        $platformStats = Visit::selectRaw('platform, count(*) as total')
-            ->groupBy('platform')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        $deviceStats = Visit::selectRaw('device, count(*) as total')
-            ->groupBy('device')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        $topPages = Visit::selectRaw('url, count(*) as total')
-            ->groupBy('url')
-            ->orderBy('total', 'desc')
-            ->take(5)
-            ->get();
-
         return view('admin.dashboard', compact(
             'totalUsers', 'totalEbooks', 'activeUsers', 'totalReads',
             'recentActivities', 'recentEbooks', 'topEbooks', 'chartData', 'months',
-            'totalReadingHours', 'activeReadersCount', 'topReaders', 'recentReads',
-            'totalPageviews', 'totalUniqueVisitors', 'todayPageviews', 'todayUniqueVisitors',
-            'visitorChartLabels', 'visitorChartPageviews', 'visitorChartUnique',
-            'browserStats', 'platformStats', 'deviceStats', 'topPages'
+            'totalReadingHours', 'activeReadersCount', 'topReaders', 'recentReads'
         ));
     }
 

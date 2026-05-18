@@ -31,6 +31,18 @@ class DatabaseSeeder extends Seeder
             'must_change_password' => false,
         ]);
 
+        // Demo User (Siswa)
+        User::create([
+            'name' => 'Siswa Demo',
+            'email' => 'siswa@sandikta.sch.id',
+            'nis' => '220001',
+            'kelas' => 'X-A',
+            'password' => Hash::make('password123'),
+            'role' => 'user',
+            'is_active' => true,
+            'must_change_password' => false,
+        ]);
+
 
 
         // Categories

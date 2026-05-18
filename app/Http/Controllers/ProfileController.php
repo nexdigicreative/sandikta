@@ -50,7 +50,7 @@ class ProfileController extends Controller
             'avatar.max' => 'Ukuran maksimal 2MB.',
         ]);
 
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         // Delete old avatar
         if ($user->avatar) {
@@ -69,7 +69,7 @@ class ProfileController extends Controller
 
     public function deleteAvatar()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         if ($user->avatar) {
             Storage::disk('public')->delete($user->avatar);

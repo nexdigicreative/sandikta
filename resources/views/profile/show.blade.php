@@ -37,13 +37,16 @@
                                 <button type="button" class="btn btn-sm btn-link text-danger p-0"
                                     onclick="confirmDeleteAvatar()"><i class="bi bi-trash me-1"></i>Hapus Foto</button>
                             </div>
-                            <form action="{{ route('profile.delete-avatar') }}" method="POST" id="deleteAvatarForm"
-                                class="d-none">
-                                @csrf
-                                @method('DELETE')
-                            </form>
                         @endif
                     </form>
+
+                    @if($user->avatar)
+                        <form action="{{ route('profile.delete-avatar') }}" method="POST" id="deleteAvatarForm" class="d-none">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endif
+                    
                     <h4 style="font-weight:800">{{ $user->name }}</h4>
                     <span class="badge-modern badge-info mb-3" style="text-transform:capitalize">{{ $user->role }}</span>
 
