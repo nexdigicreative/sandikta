@@ -142,37 +142,37 @@ class UserController extends Controller
         $file = $request->file('file');
 
         try {
-            $content = file_get_contents($file->getPathname());
-            // Remove UTF-8 BOM if present
-            $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+            $handle = fopen($file->getPathname(), 'r');
+            if (!$handle) {
+                return back()->with('error', 'Gagal membaca file CSV.');
+            }
 
-            // Normalize line endings
-            $content = str_replace(["\r\n", "\r"], "\n", $content);
-            $lines = explode("\n", $content);
-
-            if (count($lines) < 2) {
+            $headerLine = fgets($handle);
+            if ($headerLine === false) {
+                fclose($handle);
                 return back()->with('error', 'File CSV kosong atau tidak valid.');
             }
 
-            // Detect delimiter from header
-            $headerLine = $lines[0];
+            // Detect delimiter from header and remove BOM
+            $headerLine = preg_replace('/^\xEF\xBB\xBF/', '', $headerLine);
             $delimiter = str_contains($headerLine, ';') ? ';' : ',';
 
-            array_shift($lines); // Remove header
-
+            rewind($handle);
+            $headerRow = fgetcsv($handle, 0, $delimiter);
+            
             $imported = 0;
             $errors = [];
             $skipped = 0;
+            $index = 0;
 
-            foreach ($lines as $index => $line) {
-                if (empty(trim($line)))
+            while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+                $index++;
+                if (array_filter($row) === [])
                     continue;
-
-                $row = str_getcsv($line, $delimiter);
 
                 // Expecting at least 4 columns: NIS, Nama, Kelas, Tgl Lahir
                 if (count($row) < 4) {
-                    $errors[] = "Baris " . ($index + 2) . ": Format kolom tidak lengkap.";
+                    $errors[] = "Baris " . ($index + 1) . ": Format kolom tidak lengkap.";
                     continue;
                 }
 
@@ -188,7 +188,7 @@ class UserController extends Controller
 
                 // Validation
                 if (User::where('nis', $nis)->exists()) {
-                    $errors[] = "Baris " . ($index + 2) . ": NIS {$nis} sudah terdaftar.";
+                    $errors[] = "Baris " . ($index + 1) . ": NIS {$nis} sudah terdaftar.";
                     continue;
                 }
 
@@ -203,7 +203,7 @@ class UserController extends Controller
                     }
 
                     if (!$timestamp) {
-                        $errors[] = "Baris " . ($index + 2) . ": Format tanggal salah ({$tglRaw}). Gunakan YYYY-MM-DD atau DD/MM/YYYY.";
+                        $errors[] = "Baris " . ($index + 1) . ": Format tanggal salah ({$tglRaw}). Gunakan YYYY-MM-DD atau DD/MM/YYYY.";
                         continue;
                     }
 
@@ -222,9 +222,10 @@ class UserController extends Controller
                     ]);
                     $imported++;
                 } catch (\Exception $e) {
-                    $errors[] = "Baris " . ($index + 2) . ": Gagal menyimpan (" . $e->getMessage() . ")";
+                    $errors[] = "Baris " . ($index + 1) . ": Gagal menyimpan (" . $e->getMessage() . ")";
                 }
             }
+            fclose($handle);
 
             ActivityLog::log('import_users', "Import {$imported} users dari CSV", null, null);
 
@@ -274,30 +275,31 @@ class UserController extends Controller
             try {
                 $request->validate(['file' => 'required|file|mimes:csv,txt|max:5120']);
                 $file = $request->file('file');
-                $content = file_get_contents($file->getPathname());
-                // Remove UTF-8 BOM if present
-                $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
-                // Normalize line endings
-                $content = str_replace(["\r\n", "\r"], "\n", $content);
-                $lines = explode("\n", $content);
+                $handle = fopen($file->getPathname(), 'r');
+                if (!$handle) {
+                    return back()->with('error', 'Gagal membaca file CSV.');
+                }
 
-                if (count($lines) < 2) {
+                $headerLine = fgets($handle);
+                if ($headerLine === false) {
+                    fclose($handle);
                     return back()->with('error', 'File CSV kosong atau tidak valid.');
                 }
 
-                // Detect delimiter from header
-                $headerLine = $lines[0];
+                $headerLine = preg_replace('/^\xEF\xBB\xBF/', '', $headerLine);
                 $delimiter = str_contains($headerLine, ';') ? ';' : ',';
-                array_shift($lines); // Remove header
+                
+                rewind($handle);
+                $headerRow = fgetcsv($handle, 0, $delimiter);
 
                 $deleted = 0;
                 $notFound = [];
 
-                foreach ($lines as $line) {
-                    if (empty(trim($line)))
+                while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+                    if (array_filter($row) === [])
                         continue;
-                    $row = str_getcsv($line, $delimiter);
-                    if (empty($row[0]))
+                    
+                    if (empty(trim($row[0])))
                         continue;
 
                     $nis = trim($row[0]);
@@ -309,6 +311,7 @@ class UserController extends Controller
                         $notFound[] = $nis;
                     }
                 }
+                fclose($handle);
 
                 ActivityLog::log('bulk_delete_users', "Hapus masal {$deleted} users via CSV", null, null, 'danger');
                 $msg = "Berhasil menghapus {$deleted} anggota.";
@@ -321,7 +324,9 @@ class UserController extends Controller
             }
         } elseif ($request->has('selected_users')) {
             $ids = $request->selected_users;
-            $count = User::whereIn('id', $ids)->where('role', 'user')->delete();
+            $count = collect($ids)->chunk(100)->sum(function ($chunk) {
+                return User::whereIn('id', $chunk)->where('role', 'user')->delete();
+            });
             ActivityLog::log('bulk_delete_users', "Hapus masal {$count} users via checkbox", null, null, 'danger');
             return back()->with('success', "Berhasil menghapus {$count} anggota terpilih.");
         }
